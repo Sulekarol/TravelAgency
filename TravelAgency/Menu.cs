@@ -28,7 +28,7 @@ namespace TravelAgency
 
         static void ShowMenu()
         {
-            Console.BackgroundColor = ConsoleColor.Gray;
+            Console.BackgroundColor = ConsoleColor.Black;
             Console.Clear();
             Console.ForegroundColor = ConsoleColor.DarkGreen;
             Console.WriteLine(">>> Travel Agency<<<");
@@ -38,9 +38,9 @@ namespace TravelAgency
                 if (i == activeMenuPosition)
                 {
                     Console.BackgroundColor = ConsoleColor.DarkGreen;
-                    Console.ForegroundColor = ConsoleColor.White;
+                    Console.ForegroundColor = ConsoleColor.Black;
                     Console.WriteLine("{0,-35}", positionMenu[i]);
-                    Console.BackgroundColor = ConsoleColor.Gray;
+                    Console.BackgroundColor = ConsoleColor.Black;
                     Console.ForegroundColor = ConsoleColor.DarkGreen;
 
                 }
