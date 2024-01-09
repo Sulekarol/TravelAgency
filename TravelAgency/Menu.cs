@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Travel__Agency
+namespace TravelAgency
 {
     static class Menu
     {
@@ -35,7 +35,7 @@ namespace Travel__Agency
             Console.WriteLine();
             for (int i = 0; i < positionMenu.Length; i++)
             {
-                if (i == activePositionMenu)
+                if (i == activeMenuPosition)
                 {
                     Console.BackgroundColor = ConsoleColor.DarkGreen;
                     Console.ForegroundColor = ConsoleColor.White;
@@ -78,6 +78,27 @@ namespace Travel__Agency
 
             } while (true);
 
+        }
+
+        static void GetOption()
+        {
+            switch (activeMenuPosition)
+            {
+                case 0: Console.Clear(); OptionUnderConstruction(); break;
+                case 1: Console.Clear(); OptionUnderConstruction(); break;
+                case 2: Console.Clear(); OptionUnderConstruction(); break;
+                case 3: Console.Clear(); OptionUnderConstruction(); break;
+                case 4: Console.Clear(); OptionUnderConstruction(); break;
+                case 5: Environment.Exit(0); break;
+
+            }
+        }
+
+        static void OptionUnderConstruction()
+        {
+            Console.SetCursorPosition(12, 4);
+            Console.Write("We Work on this, Sory :(");
+            Console.ReadKey();
         }
 
 
