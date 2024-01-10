@@ -100,7 +100,7 @@ namespace TravelAgency
         static void OptionUnderConstruction()
         {
             Console.SetCursorPosition(12, 4);
-            Console.Write("We Work on this, Sory :(");
+            Console.Write("We Work on this, Sorry :(");
             Console.ReadKey();
         }
 
