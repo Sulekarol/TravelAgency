@@ -6,17 +6,17 @@ using System.Threading.Tasks;
 
 namespace TravelAgency
 {
-    static class Menu
+    class Menu : Logo
     {
-        static string[] positionMenu ={"Option 1","Option 2",
-        "Option 3","Option 4",
-        "Option 5","End"};
+        static string[] positionMenu ={"[] Last minute","[] Special ForU",
+        "[] Regular","[] Ours Guids",
+        "[] Log In","End"};
 
         static int activeMenuPosition = 0;
 
         public static void StartMenu()
         {
-            Console.Title = "Travel Agency";
+            
             Console.CursorVisible = false;
             while (true)
             {
@@ -28,11 +28,14 @@ namespace TravelAgency
 
         static void ShowMenu()
         {
+
+            
             Console.BackgroundColor = ConsoleColor.Black;
             Console.Clear();
             Console.ForegroundColor = ConsoleColor.DarkGreen;
-            Console.WriteLine(">>> Travel Agency<<<");
+            Logo.ShowLogo();
             Console.WriteLine();
+           
             for (int i = 0; i < positionMenu.Length; i++)
             {
                 if (i == activeMenuPosition)
