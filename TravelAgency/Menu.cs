@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using MySql.Data.MySqlClient;
 
 namespace TravelAgency
 {
-    class Menu : Logo
+    class Menu : Offers
     {
         static string[] positionMenu ={"[] Last minute","[] Special ForU",
         "[] Regular","[] Ours Guids",
@@ -33,25 +34,43 @@ namespace TravelAgency
             Console.BackgroundColor = ConsoleColor.Black;
             Console.Clear();
             Console.ForegroundColor = ConsoleColor.DarkGreen;
-            Logo.ShowLogo();
+            Console.ForegroundColor = ConsoleColor.DarkGreen;
+                Console.WriteLine(@"
+                 _____                    _       _____ _           _   _             
+                |_   _| __ __ ___   _____| | ___ |  ___(_)_  ____ _| |_(_) ___  _ __  
+                  | || '__/ _` \ \ / / _ \ |/ _ \| |_  | \ \/ / _` | __| |/ _ \| '_ \ 
+                  | || | | (_| |\ V /  __/ | (_) |  _| | |>  < (_| | |_| | (_) | | | |
+                  |_||_|  \__,_| \_/ \___|_|\___/|_|   |_/_/\_\__,_|\__|_|\___/|_| |_|
+
+                    ");
+                Console.WriteLine("Welcome to Travelofixation!");
+                Console.WriteLine("The best page where you can find the tours to the places which can you even imagine!");
+
+
+            
+
             Console.WriteLine();
-           
-            for (int i = 0; i < positionMenu.Length; i++)
-            {
-                if (i == activeMenuPosition)
+            Console.WriteLine("Special Offer For U!");
+            Offers offers = new Offers();
+            offers.GetOffer();
+          
+          
+            for (int j = 0; j < positionMenu.Length; j++)
+            
+                if (j == activeMenuPosition)
                 {
                     Console.BackgroundColor = ConsoleColor.DarkGreen;
                     Console.ForegroundColor = ConsoleColor.Black;
-                    Console.WriteLine("{0,-35}", positionMenu[i]);
+                    Console.WriteLine("{0,-35}", positionMenu[j]);
                     Console.BackgroundColor = ConsoleColor.Black;
                     Console.ForegroundColor = ConsoleColor.DarkGreen;
 
                 }
                 else
                 {
-                    Console.WriteLine(positionMenu[i]);
+                    Console.WriteLine(positionMenu[j]);
                 }
-            }
+           
 
         }
         static void ChooseOption()

@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace TravelAgency
 {
-    public class Logo 
+    interface ILogo 
     {
 
 
-        public static void ShowLogo()
+        void ShowLogo()
         {
             Console.ForegroundColor = ConsoleColor.DarkGreen;
             Console.WriteLine(@"
