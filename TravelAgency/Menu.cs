@@ -7,20 +7,23 @@ using MySql.Data.MySqlClient;
 
 namespace TravelAgency
 {
-    class Menu : Offers
+    class Menu : DBConnect, ILogo
     {
-        static string[] positionMenu ={"[] Last minute","[] Special ForU",
-        "[] Regular","[] Ours Guids",
-        "[] Log In","End"};
+        static string[] positionMenu ={"[] Searching offer","[] Add New Offer","[] Edit Offer",
+        "[] Delete Offer","[] Ticket reservation","[] Payments"
+        ,"End"};
 
         static int activeMenuPosition = 0;
 
+
         public static void StartMenu()
         {
-            
+
             Console.CursorVisible = false;
             while (true)
             {
+
+
                 ShowMenu();
                 ChooseOption();
                 GetOption();
@@ -30,33 +33,26 @@ namespace TravelAgency
         static void ShowMenu()
         {
 
-            
+
             Console.BackgroundColor = ConsoleColor.Black;
             Console.Clear();
             Console.ForegroundColor = ConsoleColor.DarkGreen;
             Console.ForegroundColor = ConsoleColor.DarkGreen;
-                Console.WriteLine(@"
-                 _____                    _       _____ _           _   _             
-                |_   _| __ __ ___   _____| | ___ |  ___(_)_  ____ _| |_(_) ___  _ __  
-                  | || '__/ _` \ \ / / _ \ |/ _ \| |_  | \ \/ / _` | __| |/ _ \| '_ \ 
-                  | || | | (_| |\ V /  __/ | (_) |  _| | |>  < (_| | |_| | (_) | | | |
-                  |_||_|  \__,_| \_/ \___|_|\___/|_|   |_/_/\_\__,_|\__|_|\___/|_| |_|
-
-                    ");
-                Console.WriteLine("Welcome to Travelofixation!");
-                Console.WriteLine("The best page where you can find the tours to the places which can you even imagine!");
-
-
-            
-
+            ILogo.ShowLogo();
             Console.WriteLine();
-            Console.WriteLine("Special Offer For U!");
-            Offers offers = new Offers();
-            offers.GetOffer();
-          
-          
+            Console.WriteLine("Special Offer !");
+            Console.WriteLine();
+            DBConnect dBConnect = new DBConnect();
+            dBConnect.getData();
+            Console.WriteLine();
+
+
+
+
+
+
             for (int j = 0; j < positionMenu.Length; j++)
-            
+
                 if (j == activeMenuPosition)
                 {
                     Console.BackgroundColor = ConsoleColor.DarkGreen;
@@ -70,7 +66,7 @@ namespace TravelAgency
                 {
                     Console.WriteLine(positionMenu[j]);
                 }
-           
+
 
         }
         static void ChooseOption()
@@ -107,7 +103,7 @@ namespace TravelAgency
             switch (activeMenuPosition)
             {
                 case 0: Console.Clear(); OptionUnderConstruction(); break;
-                case 1: Console.Clear(); OptionUnderConstruction(); break;
+                case 1: Console.Clear(); AddNewData(); break;
                 case 2: Console.Clear(); OptionUnderConstruction(); break;
                 case 3: Console.Clear(); OptionUnderConstruction(); break;
                 case 4: Console.Clear(); OptionUnderConstruction(); break;
@@ -122,10 +118,114 @@ namespace TravelAgency
             Console.Write("We Work on this, Sorry :(");
             Console.ReadKey();
         }
+        string destynation;
+        string departure;
+        string arived;
+        string price;
+        string tourDescription;
+        string places;
 
+        static void AddNewData()
+        {
+
+
+
+            Console.SetCursorPosition(12, 4);
+            Console.Write("Add new offer !");
+            Console.WriteLine();
+            Console.Write("Where ? (City/Country) :");
+            string destynation = Console.ReadLine();
+
+            if (destynation.Length <= 3)
+            {
+                Console.WriteLine("Something went wrong, name of your City and contry is to short try again :) ");
+                Console.Clear();
+                AddNewData();
+
+            }
+
+            else
+            {
+
+            }
+            Console.WriteLine();
+            Console.Write("When? (departure - Y-M-D): ");
+            string departure = Console.ReadLine();
+            DateTime dateOfDept;
+
+            dateOfDept = DateTime.Parse(departure);
+
+
+            if (DateTime.Now < dateOfDept)
+            {
+                Console.WriteLine("Looks great, keep moving");
+
+            }
+            else if (DateTime.Now >= dateOfDept)
+            {
+                Console.WriteLine("Something went wrong, your date of departure is from the past  try again :) ");
+
+            }
+
+
+            Console.Write("When? (arived - Y-M-D): ");
+            string arived = Console.ReadLine();
+            Console.WriteLine();
+
+            Console.Write("Price:");
+            string price = Console.ReadLine();
+            Console.WriteLine();
+
+            Console.Write("Write few words about this tour: ");
+            string tourDescription = Console.ReadLine();
+            Console.WriteLine();
+
+            Console.Write("How many places are avilable? :");
+            string places = Console.ReadLine();
+
+
+
+
+
+
+            //string connStr = "server=localhost;user=root;database=biuropodrozy;port=3306;password=Nolypiok208";
+
+            //MySqlConnection conn = new MySqlConnection(connStr);
+            //try
+            //{
+
+            //    conn.Open();
+
+            //    //SQL Query to execute
+            //    //insert Query
+            //    // we are inserting actor_id, first_name, last_name, last_updated columns data
+
+            //    string sql = $"INSERT INTO Oferty_podrozy VALUES (7,'{destynation}',{departure},{arived},{price},'{tourDescription}',{places}";
+            //    MySqlCommand cmd = new MySqlCommand(sql, conn);
+            //    cmd.ExecuteNonQuery();
+
+
+            //}
+            //catch (Exception err)
+            //{
+            //    Console.WriteLine(err.ToString());
+            //}
+
+            //conn.Close();
+            //Console.WriteLine("Great, Your tour is added to our data Base ! ");
+            //Console.ReadKey();
+
+            Console.SetCursorPosition(12, 4);
+            Console.WriteLine(" Grea! Youur Tour Adding are succesfull! ");
+            Console.SetCursorPosition(12, 4);
+            Console.WriteLine("If You want to saw your tour, go to \"Searching Offer\" page and check out. ");
+
+
+        }
 
 
     }
+
 }
 
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using MySql.Data.MySqlClient;
 
 namespace TravelAgency
 {
@@ -10,7 +11,7 @@ namespace TravelAgency
     {
 
 
-        void ShowLogo()
+        public static void ShowLogo()
         {
             Console.ForegroundColor = ConsoleColor.DarkGreen;
             Console.WriteLine(@"
@@ -21,14 +22,11 @@ namespace TravelAgency
                   |_||_|  \__,_| \_/ \___|_|\___/|_|   |_/_/\_\__,_|\__|_|\___/|_| |_|
 
                     ");
-            Console.WriteLine("Welcome to Travelofixation!");
-            Console.WriteLine("The best page where you can find the tours to the places which can you even imagine!");
-
-
-        }
-
-        
+            Console.WriteLine("Welcome to Travelofixation office menagement program !");
             
+        }
+        
+      
     }      
 }
 
