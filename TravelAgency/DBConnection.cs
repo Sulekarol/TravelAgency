@@ -3,9 +3,9 @@ using MySql.Data.MySqlClient;
 
 namespace TravelAgency
 {
-    class DBConnect
+    interface IDBConnect
     {
-        public virtual void getData()
+        void GetData()
         {
             //your MySQL connection string
             string connStr = "server=localhost;user=root;database=biuropodrozy;port=3306;password=Nolypiok208";
@@ -33,33 +33,46 @@ namespace TravelAgency
 
 
         }
-        public virtual void InsertData()
+
+
+        void InsertData(string destynation, DateTime dateOfDept, string arrived, string price, string tourDescription, string places)
         {
-            string connStr = "server=localhost;user=root;database=buropodrozy=3306;password=Nolypiok208";
+            string connStr = "server=localhost;user=root;database=buropodrozy;password=Nolypiok208";
 
             MySqlConnection conn = new MySqlConnection(connStr);
             try
             {
-                Console.WriteLine("Connecting to MySQL...");
+                Console.WriteLine("");
                 conn.Open();
 
-                //SQL Query to execute
-                //insert Query
-                // we are inserting actor_id, first_name, last_name, last_updated columns data
+                // SQL Query to execute
+                // insert Query
+                // we are inserting destynation, departure, arrived, price, tourDescription, places columns data
 
-                string sql = "INSERT INTO sakila.actor VALUES ('202','First Name Actor test','Last Name Actor test', '2020-11-05 04:34:33')";
+                string sql = "INSERT INTO sakila.actor (destynation, departure, arrived, price, tourDescription, places) VALUES (@destynation, @departure, @arrived, @price, @tourDescription, @places)";
                 MySqlCommand cmd = new MySqlCommand(sql, conn);
+                cmd.Parameters.AddWithValue("@destynation", destynation);
+                cmd.Parameters.AddWithValue("@departure", dateOfDept);
+                cmd.Parameters.AddWithValue("@arrived", arrived);
+                cmd.Parameters.AddWithValue("@price", price);
+                cmd.Parameters.AddWithValue("@tourDescription", tourDescription);
+                cmd.Parameters.AddWithValue("@places", places);
                 cmd.ExecuteNonQuery();
-
-
             }
             catch (Exception err)
             {
-                Console.WriteLine(err.ToString());
+                Console.WriteLine($"Something went wrong: {err.Message}");
+            }
+            finally
+            {
+                conn.Close();
             }
 
-            conn.Close();
-            Console.WriteLine("Great, Your tour is added to our data Base ! ");
+            Console.SetCursorPosition(12, 4);
+            Console.WriteLine("Great! Your Tour Adding was successful! ");
+            Console.SetCursorPosition(12, 4);
+            Console.WriteLine("If you want to see your tour, go to the \"Searching Offer\" page and check it out.");
+
             Console.ReadKey();
         }
     }

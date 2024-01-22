@@ -11,8 +11,13 @@ namespace TravelAgency
     {
         static void Main(string[] args)
         {
-            Menu.StartMenu();
-            //LogInSignIn.StartMenu();
+            Home home = new Home();
+
+            home.StartMenu(home);
+
+            
+
+            
 
         }
     }
