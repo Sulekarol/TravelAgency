@@ -4,15 +4,21 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using MySql.Data.MySqlClient;
+using System.Diagnostics;
+using System.Security;
+using System.ComponentModel;
+
+using TravelAgency;
 
 
 namespace TravelAgency
 {
-    public class Home : IDBConnect, ILogo
+    public class Home : IDBConnect, ILogo, ISecretP
     {
         static string[] positionMenu ={"[] Searching offer","[] Add New Offer","[] Edit Offer",
         "[] Delete Offer","[] Ticket reservation","[] Payments"
         ,"End"};
+
 
         static int activeMenuPosition = 0;
 
@@ -37,14 +43,13 @@ namespace TravelAgency
         public static void ShowMenu()
         {
 
-
-            Console.BackgroundColor = ConsoleColor.Black;
             Console.Clear();
+            Console.BackgroundColor = ConsoleColor.Black;           
             Console.ForegroundColor = ConsoleColor.DarkGreen;
-            Console.ForegroundColor = ConsoleColor.DarkGreen;
-            ILogo.ShowLogo();
+            Console.ForegroundColor = ConsoleColor.DarkGreen;           
             Console.WriteLine();
-
+            ILogo.ShowLogo();
+            IDBConnect.GetData();
 
 
 
@@ -123,9 +128,27 @@ namespace TravelAgency
             Console.ReadKey();
         }
 
+        
+
+
+
+
         static void AddNewData(Home home)
         {
+            
             Console.WriteLine("Add New Offer:");
+            
+            ConsoleKeyInfo key;
+
+            Console.Write("If you want to add a new trip, enter the password to the company database.\n" +
+                "Enter Password:");
+
+            string password = ISecretP.GetMaskedInput();
+           
+
+            Console.WriteLine();
+
+            
             Console.SetCursorPosition(12, 4);
             Console.Write("Add new offer !");
             Console.WriteLine();
@@ -139,6 +162,7 @@ namespace TravelAgency
                 AddNewData(home);
                 return; // Add return to eneble software use 
             }
+            
 
             Console.WriteLine();
             Console.Write("When? (departure - Y-M-D): ");
@@ -181,51 +205,61 @@ namespace TravelAgency
             
             Console.Write("How many places are available? :");
             string places = Console.ReadLine();
-            InsertData(destynation, dateOfDept, arrived, price, tourDescription, places);
+            InsertData(password, destynation, dateOfDept, arrived, price, tourDescription, places);
             Console.ReadKey();
 
         }
 
+        
 
-        static void InsertData(string destynation, DateTime dateOfDept, string arrived, string price, string tourDescription, string places)
+ 
+
+        static void InsertData(string password ,string destynation, DateTime dateOfDept, string arrived, string price, string tourDescription, string places)
         {
-            string connStr = "server=localhost;user=root;database=biuropodrozy;port=3306;password=Nolypiok208";
+            string connStr = $"server=localhost;user=root;database=biuropodrozy;port=3306;password={password}";
 
             MySqlConnection conn = new MySqlConnection(connStr);
             try
             {
-                Console.WriteLine("");
+                
                 conn.Open();
 
-                // SQL Query to execute
-                // insert Query
-                // we are inserting destynation, departure, arrived, price, tourDescription, places columns data
+               
 
-                string sql = "INSERT INTO Oferty_podrozy (Id_rez,destynation, departure, arrived, price, tourDescription, places) VALUES (@destynation, @departure, @arrived, @price, @tourDescription, @places)";
+                string sql = "INSERT INTO Oferty_podrozy (id,destynation, dateOfDept, arrived, price, tourDescription, places) VALUES (@id,@Cel_podrozy,@Data_rozpoczecia,@Data_zakonczenia,@Cena,@Opis,@Dostepne_miejsca)";
                 MySqlCommand cmd = new MySqlCommand(sql, conn);
-                cmd.Parameters.AddWithValue("@id", 7);
-                cmd.Parameters.AddWithValue("@destynation", destynation);
-                cmd.Parameters.AddWithValue("@departure", dateOfDept);
-                cmd.Parameters.AddWithValue("@arrived", arrived);
-                cmd.Parameters.AddWithValue("@price", price);
-                cmd.Parameters.AddWithValue("@tourDescription", tourDescription);
-                cmd.Parameters.AddWithValue("@places", places);
+                cmd.Parameters.AddWithValue("@Id_oferty_podrozy", 7);
+                cmd.Parameters.AddWithValue("@Cel_podrozy", destynation);
+                cmd.Parameters.AddWithValue("@Data_rozpoczecia", dateOfDept);
+                cmd.Parameters.AddWithValue("@Data_zakonczenia", arrived);
+                cmd.Parameters.AddWithValue("@Cena", price);
+                cmd.Parameters.AddWithValue("@Opis", tourDescription);
+                cmd.Parameters.AddWithValue("@Dostepne_miejsca", places);
                 cmd.ExecuteNonQuery();
             }
             catch (Exception err)
             {
-                Console.WriteLine($"Something went wrong: {err.Message}");
+                if (true)
+                {
+                    Console.Clear();
+                    Console.WriteLine($"Something went wrong: {err.Message}");
+                }
+                else
+                {
+                    Console.Clear();
+                    Console.SetCursorPosition(12, 4);
+                    Console.WriteLine("Great! Your Tour Adding was successful! ");
+                    Console.WriteLine("If you want to see your tour, go to the \"Searching Offer\" page and check it out.");
+                }
             }
             finally
             {
                 conn.Close();
+               
             }
+            
 
-            Console.SetCursorPosition(12, 4);
-            Console.WriteLine("Great! Your Tour Adding was successful! ");
-            Console.WriteLine("If you want to see your tour, go to the \"Searching Offer\" page and check it out.");
-
-            Console.ReadKey();
+       
         }
 
 
@@ -235,11 +269,10 @@ namespace TravelAgency
 
         static void SerchingOffer(Home home)
         {
-            Console.WriteLine("Choose an option which will research for you the data");
-            Console.SetCursorPosition(12, 4);
+            
+            
             string[] menuOption = { "[] When", "[] Where", "[] Price", "Back" };
-            Console.WriteLine("Serching Offer:");
-            Console.SetCursorPosition(12, 4);
+           
             Console.CursorVisible = false;
             while (true)
             {
@@ -260,6 +293,9 @@ namespace TravelAgency
             Console.ForegroundColor = ConsoleColor.DarkGreen;
             Console.ForegroundColor = ConsoleColor.DarkGreen;
             Console.WriteLine();
+            Console.WriteLine("Serching Offer:");
+            Console.SetCursorPosition(12, 4);
+            Console.WriteLine("Choose an option which will research for you the data");
 
 
 

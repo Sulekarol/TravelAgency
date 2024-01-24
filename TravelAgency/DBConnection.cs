@@ -5,10 +5,10 @@ namespace TravelAgency
 {
     interface IDBConnect
     {
-        void GetData()
+        static void GetData()
         {
             //your MySQL connection string
-            string connStr = "server=localhost;user=root;database=biuropodrozy;port=3306;password=Nolypiok208";
+            string connStr = $"server=localhost;user=root;database=biuropodrozy;port=3306;password=drzwi";
 
             MySqlConnection conn = new MySqlConnection(connStr);
 
@@ -23,8 +23,11 @@ namespace TravelAgency
             MySqlDataReader rdr = cmd.ExecuteReader();
 
             //read the data
+            Console.WriteLine("Best Offer!");
+            Console.WriteLine();
             rdr.Read();
             Console.WriteLine(rdr[1] + " -- " + rdr[4] + " Euro" + " -- " + rdr[5]);
+            Console.WriteLine();
 
             rdr.Close();
 
@@ -35,9 +38,9 @@ namespace TravelAgency
         }
 
 
-        void InsertData(string destynation, DateTime dateOfDept, string arrived, string price, string tourDescription, string places)
+        void InsertData(string password,string destynation, DateTime dateOfDept, string arrived, string price, string tourDescription, string places)
         {
-            string connStr = "server=localhost;user=root;database=buropodrozy;password=Nolypiok208";
+            string connStr = $"server=localhost;user=root;database=buropodrozy;password={password}";
 
             MySqlConnection conn = new MySqlConnection(connStr);
             try
