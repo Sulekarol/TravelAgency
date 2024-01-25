@@ -18,16 +18,19 @@ namespace TravelAgency
 
             //SQL Query to execute
             //selecting only first 10 rows for demo
-            string sql = "select * from Oferty_podrozy limit 0,3;";
+            string sql = "SELECT Cel_podrozy,Data_rozpoczecia,Data_zakonczenia,Cena,Opis,Dostepne_miejsca FROM Oferty_podrozy WHERE Data_rozpoczecia >= '2023-03-03';";
             MySqlCommand cmd = new MySqlCommand(sql, conn);
             MySqlDataReader rdr = cmd.ExecuteReader();
 
+            Console.WriteLine("This is all what you looking for");
+            Console.WriteLine();
             //read the data
-            Console.WriteLine("Best Offer!");
-            Console.WriteLine();
-            rdr.Read();
-            Console.WriteLine(rdr[1] + " -- " + rdr[4] + " Euro" + " -- " + rdr[5]);
-            Console.WriteLine();
+            while (rdr.Read())
+            {
+
+                rdr.Read();
+                Console.WriteLine("" + rdr[0] + " -- " + rdr[1] + " Euro" + " -- " + rdr[2] + " -- \n" + rdr[3] + " Euro" + " -- " + rdr[4] + " -- " + rdr[5]);
+            }
 
             rdr.Close();
 
@@ -38,11 +41,12 @@ namespace TravelAgency
         }
 
 
-        void InsertData(string password,string destynation, DateTime dateOfDept, string arrived, string price, string tourDescription, string places)
+        void InsertData(string password, string destynation, DateTime dateOfDept, string arrived, string price, string tourDescription, string places)
         {
-            string connStr = $"server=localhost;user=root;database=buropodrozy;password={password}";
+            string connStr = $"server=localhost;user=root;database=buropodrozy;port=3306;password=";
 
             MySqlConnection conn = new MySqlConnection(connStr);
+
             try
             {
                 Console.WriteLine("");
@@ -52,16 +56,13 @@ namespace TravelAgency
                 // insert Query
                 // we are inserting destynation, departure, arrived, price, tourDescription, places columns data
 
-                string sql = "INSERT INTO sakila.actor (destynation, departure, arrived, price, tourDescription, places) VALUES (@destynation, @departure, @arrived, @price, @tourDescription, @places)";
+                string sql = $"INSERT INTO Oferty_podrozy (Cel_podrozy, Data_rozpoczenca, Data_zakonczenia, Cena, Opis, Dostepne_miejsca) VALUES ({destynation},{dateOfDept},{arrived},{price},{tourDescription},{places})";
                 MySqlCommand cmd = new MySqlCommand(sql, conn);
-                cmd.Parameters.AddWithValue("@destynation", destynation);
-                cmd.Parameters.AddWithValue("@departure", dateOfDept);
-                cmd.Parameters.AddWithValue("@arrived", arrived);
-                cmd.Parameters.AddWithValue("@price", price);
-                cmd.Parameters.AddWithValue("@tourDescription", tourDescription);
-                cmd.Parameters.AddWithValue("@places", places);
-                cmd.ExecuteNonQuery();
+                MySqlDataReader rdr = cmd.ExecuteReader();
+                rdr.Read();
+                Console.WriteLine();
             }
+
             catch (Exception err)
             {
                 Console.WriteLine($"Something went wrong: {err.Message}");
@@ -79,6 +80,6 @@ namespace TravelAgency
             Console.ReadKey();
         }
     }
-    
+
 }
 

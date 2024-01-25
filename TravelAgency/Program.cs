@@ -5,9 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using MySql.Data.MySqlClient;
 
-namespace TravelAgency 
+namespace TravelAgency
 {
-    class Program 
+    class Program
     {
         static void Main(string[] args)
         {
@@ -15,9 +15,6 @@ namespace TravelAgency
 
             home.StartMenu(home);
 
-            
-
-            
 
         }
     }

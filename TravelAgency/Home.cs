@@ -12,7 +12,10 @@ using TravelAgency;
 
 
 namespace TravelAgency
+
 {
+    // MAIN MENU 
+
     public class Home : IDBConnect, ILogo, ISecretP
     {
         static string[] positionMenu ={"[] Searching offer","[] Add New Offer","[] Edit Offer",
@@ -22,7 +25,7 @@ namespace TravelAgency
 
         static int activeMenuPosition = 0;
 
-        
+
 
         public void StartMenu(Home home)
         {
@@ -37,19 +40,20 @@ namespace TravelAgency
                 ChooseOption();
                 GetOption(home);
             }
-           
+
         }
 
         public static void ShowMenu()
         {
 
             Console.Clear();
-            Console.BackgroundColor = ConsoleColor.Black;           
+            Console.BackgroundColor = ConsoleColor.Black;
             Console.ForegroundColor = ConsoleColor.DarkGreen;
-            Console.ForegroundColor = ConsoleColor.DarkGreen;           
+            Console.ForegroundColor = ConsoleColor.DarkGreen;
             Console.WriteLine();
             ILogo.ShowLogo();
-            IDBConnect.GetData();
+            Console.WriteLine();
+
 
 
 
@@ -104,7 +108,7 @@ namespace TravelAgency
 
         public static void GetOption(Home home)
         {
-            
+
 
             switch (activeMenuPosition)
             {
@@ -128,30 +132,36 @@ namespace TravelAgency
             Console.ReadKey();
         }
 
-        
 
 
 
+        // ADD NEW TOUR PAGE 
 
         static void AddNewData(Home home)
         {
-            
+
+
+
+
             Console.WriteLine("Add New Offer:");
-            
-            ConsoleKeyInfo key;
+
+
 
             Console.Write("If you want to add a new trip, enter the password to the company database.\n" +
                 "Enter Password:");
 
+
             string password = ISecretP.GetMaskedInput();
-           
+
 
             Console.WriteLine();
 
-            
+
             Console.SetCursorPosition(12, 4);
             Console.Write("Add new offer !");
             Console.WriteLine();
+
+
             Console.Write("Where ? (City/Country) :");
             string destynation = Console.ReadLine();
 
@@ -162,80 +172,112 @@ namespace TravelAgency
                 AddNewData(home);
                 return; // Add return to eneble software use 
             }
-            
+
 
             Console.WriteLine();
             Console.Write("When? (departure - Y-M-D): ");
             string departure = Console.ReadLine();
-            
-            DateTime dateOfDept;
-            
-            if (!DateTime.TryParse(departure, out dateOfDept))
-            {
-                Console.WriteLine("Invalid date format. Please enter the date in the correct format (Y-M-D).");
-                AddNewData(home);
-                Console.Clear();
-                return;
+            //string data = DateTime.Now;
 
-            }
-            
-            if (DateTime.Now < dateOfDept)
-            {
-                Console.WriteLine("Looks great, keep moving");
-            }
-            else
-            {
-                Console.WriteLine("Something went wrong, your date of departure is in the past. Try again :) ");
-                AddNewData(home);
-                Console.Clear();
-                return;
-            }
-            
+            //if (departure <= )
+            //{
+            //    Console.WriteLine("Invalid date format. Please enter the date in the correct format (Y-M-D).");
+            //    AddNewData(home);
+            //    Console.Clear();
+            //    return;
+
+            //}
+
+            //if ()
+            //{
+            //    Console.WriteLine("Looks great, keep moving");
+            //}
+            //else
+            //{
+            //    Console.WriteLine("Something went wrong, your date of departure is in the past. Try again :) ");
+            //    AddNewData(home);
+            //    Console.Clear();
+            //    return;
+            //}
+
             Console.Write("When? (arrived - Y-M-D): ");
             string arrived = Console.ReadLine();
             Console.WriteLine();
-            
+
             Console.Write("Price:");
             string price = Console.ReadLine();
             Console.WriteLine();
-            
+
             Console.Write("Write few words about this tour: ");
             string tourDescription = Console.ReadLine();
             Console.WriteLine();
-            
+            int id = 8;
             Console.Write("How many places are available? :");
             string places = Console.ReadLine();
-            InsertData(password, destynation, dateOfDept, arrived, price, tourDescription, places);
+            InsertData(password, destynation, departure, arrived, price, tourDescription, places);
+
+            while (true)
+            {
+                if (Console.KeyAvailable)
+                {
+                    ConsoleKeyInfo key = Console.ReadKey(true);
+                    if (key.Key == ConsoleKey.Escape)
+                    {
+                        Console.WriteLine("Adding new offer cancelled.");
+                        break; // Break out of the loop to exit the function
+                    }
+                }
+            }
+
+
             Console.ReadKey();
+
+
 
         }
 
-        
+        // INSER DATA FOR ADDING PAGE 
 
- 
-
-        static void InsertData(string password ,string destynation, DateTime dateOfDept, string arrived, string price, string tourDescription, string places)
+        static void InsertData(string password, string destynation, string departure, string arrived, string price, string tourDescription, string places)
         {
-            string connStr = $"server=localhost;user=root;database=biuropodrozy;port=3306;password={password}";
+            string connStr = $"server=localhost;user=root;database=biuropodrozy;port=3306;password=drzwi";
 
-            MySqlConnection conn = new MySqlConnection(connStr);
+            string sql1 = "SELECT Id_oferty_podrozy FROM Oferty_podrozy ORDER BY Id_oferty_podrozy DESC LIMIT 1;";
+            int sql3 = 0;
+
+            using (MySqlConnection conn = new MySqlConnection(connStr))
+            {
+                conn.Open();
+                MySqlCommand cmd = new MySqlCommand(sql1, conn);
+                using (MySqlDataReader rdr = cmd.ExecuteReader())
+                {
+                    if (rdr.Read())
+                    {
+                        // Pobranie wartości zapytania SQL i konwersja na int
+                        sql3 = rdr.GetInt32(0);
+                    }
+                }
+            }
+            sql3++;
+            string sql2 = sql3.ToString();
+
+
+            string connStr1 = $"server=localhost;user=root;database=biuropodrozy;port=3306;password={password}";
+
+            MySqlConnection conn1 = new MySqlConnection(connStr1);
             try
             {
-                
-                conn.Open();
 
-               
+                conn1.Open();
 
-                string sql = "INSERT INTO Oferty_podrozy (id,destynation, dateOfDept, arrived, price, tourDescription, places) VALUES (@id,@Cel_podrozy,@Data_rozpoczecia,@Data_zakonczenia,@Cena,@Opis,@Dostepne_miejsca)";
-                MySqlCommand cmd = new MySqlCommand(sql, conn);
-                cmd.Parameters.AddWithValue("@Id_oferty_podrozy", 7);
-                cmd.Parameters.AddWithValue("@Cel_podrozy", destynation);
-                cmd.Parameters.AddWithValue("@Data_rozpoczecia", dateOfDept);
-                cmd.Parameters.AddWithValue("@Data_zakonczenia", arrived);
-                cmd.Parameters.AddWithValue("@Cena", price);
-                cmd.Parameters.AddWithValue("@Opis", tourDescription);
-                cmd.Parameters.AddWithValue("@Dostepne_miejsca", places);
-                cmd.ExecuteNonQuery();
+
+
+                string sql = $"INSERT INTO Oferty_podrozy (Id_oferty_podrozy,Cel_podrozy, Data_rozpoczecia, Data_zakonczenia, Cena, Opis, Dostepne_miejsca) VALUES ({sql2},'{destynation}','{departure}','{arrived}',{price},'{tourDescription}',{places})";
+                MySqlCommand cmd = new MySqlCommand(sql, conn1);
+                MySqlDataReader rdr = cmd.ExecuteReader();
+                rdr.Read();
+                Console.WriteLine();
+
             }
             catch (Exception err)
             {
@@ -244,35 +286,36 @@ namespace TravelAgency
                     Console.Clear();
                     Console.WriteLine($"Something went wrong: {err.Message}");
                 }
-                else
-                {
-                    Console.Clear();
-                    Console.SetCursorPosition(12, 4);
-                    Console.WriteLine("Great! Your Tour Adding was successful! ");
-                    Console.WriteLine("If you want to see your tour, go to the \"Searching Offer\" page and check it out.");
-                }
+
+                Console.Clear();
+                Console.SetCursorPosition(12, 4);
+                Console.WriteLine("Great! Your Tour Adding was successful! ");
+                Console.WriteLine("If you want to see your tour, go to the \"Searching Offer\" page and check it out.");
+
             }
             finally
             {
-                conn.Close();
-               
-            }
-            
+                conn1.Close();
 
-       
+            }
+
+
+
         }
 
 
         static string[] menuOption = { "[] When", "[] Where", "[] Price", "Back" };
         static int activeMenuOption = 0;
 
+        //SEARCHING OFFER PAGE 
 
         static void SerchingOffer(Home home)
         {
-            
-            
+
+
+
             string[] menuOption = { "[] When", "[] Where", "[] Price", "Back" };
-           
+
             Console.CursorVisible = false;
             while (true)
             {
@@ -354,19 +397,229 @@ namespace TravelAgency
         {
             switch (activeMenuOption)
             {
-                case 0: Console.Clear(); OptionUnderConstruction(); break;
-                case 1: Console.Clear(); OptionUnderConstruction(); break;
+                case 0: Console.Clear(); When(home); break;
+                case 1: Console.Clear(); Where(); break;
+                case 2: Console.Clear(); Price(); break;
                 case 3: Console.Clear(); home.StartMenu(home); break;
 
             }
         }
 
+        static void When(Home home)
+        {
+            ConsoleKeyInfo key;
+            Console.WriteLine("Searching offer");
+            Console.WriteLine();
+            Console.Write("Enter departure data:");
+            string from = Console.ReadLine();
+
+            Console.WriteLine();
+            GetData(from);
+            Console.ReadKey();
+
+            static void GetData(string from)
+            {
+                //your MySQL connection string
+                string connStr = $"server=localhost;user=root;database=biuropodrozy;port=3306;password=drzwi";
+
+                MySqlConnection conn = new MySqlConnection(connStr);
+
+
+                try
+                {
+                    conn.Open();
+
+                    //SQL Query to execute
+                    //selecting only first 10 rows for demo
+                    string sql = $"SELECT Cel_podrozy,Data_rozpoczecia,Data_zakonczenia,Cena,Opis,Dostepne_miejsca FROM Oferty_podrozy WHERE Data_rozpoczecia >= '{from}';";
+                    MySqlCommand cmd = new MySqlCommand(sql, conn);
+                    MySqlDataReader rdr = cmd.ExecuteReader();
+
+
+
+                    if (rdr.Read())
+                    {
+                        do
+                        {
+                            Console.WriteLine(rdr[0] + "--" + rdr[1] + " Euro" + "--" + rdr[2] + "--" + rdr[3] + " Euro" + " -- " + rdr[4] + " -- " + rdr[5]);
+                            Console.WriteLine();
+                        }
+                        while (rdr.Read());
+                    }
+                    else
+                    {
+                        Console.WriteLine("Brak danych.");
+                    }
+
+
+
+                    rdr.Close();
+                }
+                catch (Exception exx)
+                {
+                    Console.WriteLine($"Somthing went wrong: {exx}");
+                }
+                finally
+                {
+
+
+                    conn.Close();
+
+                }
+
+
+
+            }
+        }
+
+        static void Where()
+        {
+            Console.WriteLine("");
+            ConsoleKeyInfo key;
+            Console.WriteLine("Searching offer");
+            Console.WriteLine();
+            Console.Write("Enter place where you wont to go:");
+            string destynation = Console.ReadLine();
+            Console.WriteLine();
+            GetData(destynation);
+            Console.ReadKey();
+
+            static void GetData(string destynation)
+            {
+                //your MySQL connection string
+                string connStr = $"server=localhost;user=root;database=biuropodrozy;port=3306;password=drzwi";
+
+                MySqlConnection conn = new MySqlConnection(connStr);
+
+
+                try
+                {
+                    conn.Open();
+
+                    //SQL Query to execute
+                    //selecting only first 10 rows for demo
+                    string sql = $"SELECT Cel_podrozy,Data_rozpoczecia,Data_zakonczenia,Cena,Opis,Dostepne_miejsca FROM Oferty_podrozy WHERE Cel_podrozy = '{destynation}';";
+                    MySqlCommand cmd = new MySqlCommand(sql, conn);
+                    MySqlDataReader rdr = cmd.ExecuteReader();
+
+
+
+                    if (rdr.Read())
+                    {
+                        do
+                        {
+                            Console.WriteLine(rdr[0] + "--" + rdr[1] + " Euro" + "--" + rdr[2] + "--" + rdr[3] + " Euro" + " -- " + rdr[4] + " -- " + rdr[5]);
+                            Console.WriteLine();
+                        }
+                        while (rdr.Read());
+                    }
+                    else
+                    {
+                        Console.WriteLine("Brak danych.");
+                    }
+
+                    rdr.Close();
+
+                }
+                catch (Exception exx)
+                {
+                    Console.WriteLine($"Somthing went wrong: {exx}");
+                }
+                finally
+                {
+
+
+                    conn.Close();
+
+                }
+            }
+        }
+
+        static void Price()
+        {
+
+            ConsoleKeyInfo key;
+            Console.WriteLine("Searching offer");
+            Console.WriteLine();
+            Console.Write("Enter the amount you would like to spend on the trip :");
+            string price = Console.ReadLine();
+            double amount = double.Parse(price);
+            Console.WriteLine();
+            GetData(amount);
+            Console.ReadKey();
+
+            static void GetData(double amount)
+            {
+                //your MySQL connection string
+                string connStr = $"server=localhost;user=root;database=biuropodrozy;port=3306;password=drzwi";
+
+                MySqlConnection conn = new MySqlConnection(connStr);
+
+
+                try
+                {
+                    conn.Open();
+
+                    //SQL Query to execute
+                    //selecting only first 10 rows for demo
+                    string sql = $"SELECT Cel_podrozy,Data_rozpoczecia,Data_zakonczenia,Cena,Opis,Dostepne_miejsca FROM Oferty_podrozy WHERE Cena <= {amount};";
+                    MySqlCommand cmd = new MySqlCommand(sql, conn);
+                    MySqlDataReader rdr = cmd.ExecuteReader();
+
+
+
+                    if (rdr.Read())
+                    {
+                        do
+                        {
+                            Console.WriteLine(rdr[0] + "--" + rdr[1] + " Euro" + "--" + rdr[2] + "--" + rdr[3] + " Euro" + " -- " + rdr[4] + " -- " + rdr[5]);
+                            Console.WriteLine();
+                        }
+                        while (rdr.Read());
+                    }
+                    else
+                    {
+                        Console.WriteLine("Brak danych.");
+                    }
+
+                    rdr.Close();
+                }
+                catch (Exception exx)
+                {
+                    Console.WriteLine($"Somthing went wrong: {exx}");
+                }
+                finally
+                {
+
+
+                    conn.Close();
+
+                }
+            }
 
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        }
     }
 }
+
+
 
 
 
