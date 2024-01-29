@@ -16,10 +16,10 @@ namespace TravelAgency
 {
     // MAIN MENU 
 
-    public class Home : IDBConnect, ILogo, ISecretP
+    public class Home : Menu, IDBConnect, ILogo, ISecretP
     {
         static string[] positionMenu ={"[] Searching offer","[] Add New Offer","[] Edit Offer",
-        "[] Delete Offer","[] Ticket reservation","[] Payments"
+        "[] Delete Offer","[] Ticket reservation"
         ,"End"};
 
 
@@ -27,7 +27,7 @@ namespace TravelAgency
 
 
 
-        public void StartMenu(Home home)
+        public override void StartMenu(Home home)
         {
 
 
@@ -43,7 +43,7 @@ namespace TravelAgency
 
         }
 
-        public static void ShowMenu()
+        public override void ShowMenu()
         {
 
             Console.Clear();
@@ -75,7 +75,7 @@ namespace TravelAgency
 
 
         }
-        public static void ChooseOption()
+        public override void ChooseOption()
         {
             do
             {
@@ -106,7 +106,7 @@ namespace TravelAgency
         }
 
 
-        public static void GetOption(Home home)
+        public override void GetOption(Home home)
         {
 
 
@@ -114,18 +114,17 @@ namespace TravelAgency
             {
                 case 0: Console.Clear(); SerchingOffer(home); break;
                 case 1: Console.Clear(); AddNewData(home); break;
-                case 2: Console.Clear(); OptionUnderConstruction(); break;
+                case 2: Console.Clear(); EditOffer(); break;
                 case 3: Console.Clear(); OptionUnderConstruction(); break;
                 case 4: Console.Clear(); OptionUnderConstruction(); break;
-                case 5: Console.Clear(); OptionUnderConstruction(); break;
-                case 6: Environment.Exit(0); break;
+                case 5: Environment.Exit(0); break;
 
             }
         }
 
 
 
-        public static void OptionUnderConstruction()
+        public override void OptionUnderConstruction()
         {
             Console.SetCursorPosition(12, 4);
             Console.Write("We Work on this, Sorry :(");
@@ -137,7 +136,7 @@ namespace TravelAgency
 
         // ADD NEW TOUR PAGE 
 
-        static void AddNewData(Home home)
+        public static void AddNewData(Home home)
         {
 
 
@@ -146,15 +145,24 @@ namespace TravelAgency
             Console.WriteLine("Add New Offer:");
 
 
-
             Console.Write("If you want to add a new trip, enter the password to the company database.\n" +
-                "Enter Password:");
-
+                            "Enter Password:");
 
             string password = ISecretP.GetMaskedInput();
+            
+                
 
 
-            Console.WriteLine();
+                if (password.Length <= 0)
+                {
+                    Console.WriteLine("Are you forget insert a password. Are you wont try again? (select YES - enter , NO- escape)");
+                Console.ReadKey();
+                }
+
+
+
+            
+        Console.WriteLine();
 
 
             Console.SetCursorPosition(12, 4);
@@ -175,30 +183,35 @@ namespace TravelAgency
 
 
             Console.WriteLine();
-            Console.Write("When? (departure - Y-M-D): ");
-            string departure = Console.ReadLine();
-            //string data = DateTime.Now;
+            Console.Write("When? (departure- Y-M-D): ");
+            string dept = Console.ReadLine();
 
-            //if (departure <= )
-            //{
-            //    Console.WriteLine("Invalid date format. Please enter the date in the correct format (Y-M-D).");
-            //    AddNewData(home);
-            //    Console.Clear();
-            //    return;
+            DateTime date = DateTime.Parse(dept);
 
-            //}
+            if (date <= DateTime.Now)
+            {
+                Console.WriteLine("Invalid date format. Please enter the date in the correct format (Y-M-D).");
+                Console.WriteLine();
+                Console.Clear();
+                AddNewData(home);
+                return;
 
-            //if ()
-            //{
-            //    Console.WriteLine("Looks great, keep moving");
-            //}
-            //else
-            //{
-            //    Console.WriteLine("Something went wrong, your date of departure is in the past. Try again :) ");
-            //    AddNewData(home);
-            //    Console.Clear();
-            //    return;
-            //}
+            }
+            
+
+            else if(date> DateTime.Now)
+            {
+                Console.WriteLine("Looks great, keep moving");
+            }
+            else
+            {
+                Console.WriteLine("Something went wrong, your date of departure is in the past. Try again :) ");
+                AddNewData(home);
+                Console.Clear();
+                return;
+            }
+            string departure = date.ToString();
+            
 
             Console.Write("When? (arrived - Y-M-D): ");
             string arrived = Console.ReadLine();
@@ -281,21 +294,20 @@ namespace TravelAgency
             }
             catch (Exception err)
             {
-                if (true)
-                {
-                    Console.Clear();
-                    Console.WriteLine($"Something went wrong: {err.Message}");
-                }
 
                 Console.Clear();
-                Console.SetCursorPosition(12, 4);
-                Console.WriteLine("Great! Your Tour Adding was successful! ");
-                Console.WriteLine("If you want to see your tour, go to the \"Searching Offer\" page and check it out.");
+                Console.WriteLine($"Something went wrong: {err.Message}");
 
             }
             finally
             {
                 conn1.Close();
+
+                Console.Clear();
+                Console.SetCursorPosition(12, 4);
+                Console.WriteLine("Great! Your Tour Adding was successful! ");
+                Console.WriteLine("If you want to see your tour, go to the \"Searching Offer\" page and check it out.");
+                Console.ReadKey();
 
             }
 
@@ -309,7 +321,7 @@ namespace TravelAgency
 
         //SEARCHING OFFER PAGE 
 
-        static void SerchingOffer(Home home)
+        public static void SerchingOffer(Home home)
         {
 
 
@@ -597,22 +609,14 @@ namespace TravelAgency
                 }
             }
 
+        }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        static void EditOffer()
+        {
+            Console.WriteLine("Edit offer:");
+            Console.WriteLine();
+            Console.ReadKey();
+            Console.WriteLine("If you wont ");
 
 
         }
