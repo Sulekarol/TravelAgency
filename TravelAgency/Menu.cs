@@ -3,16 +3,16 @@ namespace TravelAgency
 {
 	public abstract class Menu 
 	{
-        static string[] positionMenu ={"[] Searching offer","[] Add New Offer","[] Edit Offer",
+        public static string[] positionMenu ={"[] Searching offer","[] Add New Offer","[] Edit Offer",
         "[] Delete Offer","[] Ticket reservation","[] Payments"
         ,"End"};
 
 
-        static int activeMenuPosition = 0;
+        public static int activeMenuPosition = 0;
 
 
 
-        public virtual void StartMenu(Home home )
+        public virtual void StartMenu(Home home)
         {
 
 

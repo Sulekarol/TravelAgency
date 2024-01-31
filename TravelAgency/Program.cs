@@ -4,20 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using MySql.Data.MySqlClient;
+using TravelAgency;
 
-namespace TravelAgency
-{
-    class Program
-    {
-        static void Main(string[] args)
-        {
-            Home home = new Home();
-
-            home.StartMenu(home);
+Home home = new Home();
 
 
 
 
-        }
-    }
-}
+home.StartMenu(home);

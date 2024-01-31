@@ -7,8 +7,9 @@ using MySql.Data.MySqlClient;
 using System.Diagnostics;
 using System.Security;
 using System.ComponentModel;
-
 using TravelAgency;
+
+
 
 
 namespace TravelAgency
@@ -18,12 +19,12 @@ namespace TravelAgency
 
     public class Home : Menu, IDBConnect, ILogo, ISecretP
     {
-        static string[] positionMenu ={"[] Searching offer","[] Add New Offer","[] Edit Offer",
+        public static new string[] positionMenu ={"[] Searching offer","[] Add New Offer","[] Edit Offer",
         "[] Delete Offer","[] Ticket reservation"
         ,"End"};
 
 
-        static int activeMenuPosition = 0;
+        static new int activeMenuPosition = 0;
 
 
 
@@ -58,7 +59,7 @@ namespace TravelAgency
 
 
             for (int j = 0; j < positionMenu.Length; j++)
-
+            {
                 if (j == activeMenuPosition)
                 {
                     Console.BackgroundColor = ConsoleColor.DarkGreen;
@@ -72,8 +73,7 @@ namespace TravelAgency
                 {
                     Console.WriteLine(positionMenu[j]);
                 }
-
-
+            }
         }
         public override void ChooseOption()
         {
@@ -114,8 +114,8 @@ namespace TravelAgency
             {
                 case 0: Console.Clear(); SerchingOffer(home); break;
                 case 1: Console.Clear(); AddNewData(home); break;
-                case 2: Console.Clear(); EditOffer(); break;
-                case 3: Console.Clear(); OptionUnderConstruction(); break;
+                case 2: Console.Clear(); EditOffer(home); break;
+                case 3: Console.Clear(); Delate(home); break;
                 case 4: Console.Clear(); OptionUnderConstruction(); break;
                 case 5: Environment.Exit(0); break;
 
@@ -149,20 +149,20 @@ namespace TravelAgency
                             "Enter Password:");
 
             string password = ISecretP.GetMaskedInput();
-            
-                
 
 
-                if (password.Length <= 0)
-                {
-                    Console.WriteLine("Are you forget insert a password. Are you wont try again? (select YES - enter , NO- escape)");
+
+
+            if (password.Length <= 0)
+            {
+                Console.WriteLine("Are you forget insert a password. Are you wont try again? (select YES - enter , NO- escape)");
                 Console.ReadKey();
-                }
+            }
 
 
 
-            
-        Console.WriteLine();
+
+            Console.WriteLine();
 
 
             Console.SetCursorPosition(12, 4);
@@ -197,9 +197,9 @@ namespace TravelAgency
                 return;
 
             }
-            
 
-            else if(date> DateTime.Now)
+
+            else if (date > DateTime.Now)
             {
                 Console.WriteLine("Looks great, keep moving");
             }
@@ -211,7 +211,7 @@ namespace TravelAgency
                 return;
             }
             string departure = date.ToString();
-            
+
 
             Console.Write("When? (arrived - Y-M-D): ");
             string arrived = Console.ReadLine();
@@ -290,7 +290,7 @@ namespace TravelAgency
                 MySqlDataReader rdr = cmd.ExecuteReader();
                 rdr.Read();
                 Console.WriteLine();
-
+                rdr.Close();
             }
             catch (Exception err)
             {
@@ -308,6 +308,7 @@ namespace TravelAgency
                 Console.WriteLine("Great! Your Tour Adding was successful! ");
                 Console.WriteLine("If you want to see your tour, go to the \"Searching Offer\" page and check it out.");
                 Console.ReadKey();
+
 
             }
 
@@ -487,12 +488,16 @@ namespace TravelAgency
         static void Where()
         {
             Console.WriteLine("");
+
             ConsoleKeyInfo key;
             Console.WriteLine("Searching offer");
+
             Console.WriteLine();
             Console.Write("Enter place where you wont to go:");
+
             string destynation = Console.ReadLine();
             Console.WriteLine();
+
             GetData(destynation);
             Console.ReadKey();
 
@@ -551,10 +556,13 @@ namespace TravelAgency
         {
 
             ConsoleKeyInfo key;
+
             Console.WriteLine("Searching offer");
             Console.WriteLine();
             Console.Write("Enter the amount you would like to spend on the trip :");
+
             string price = Console.ReadLine();
+
             double amount = double.Parse(price);
             Console.WriteLine();
             GetData(amount);
@@ -611,17 +619,689 @@ namespace TravelAgency
 
         }
 
-        static void EditOffer()
+        //// EDIT OFFER
+
+        public static string[] position ={"[] Destynation","[] Price","[] Departure",
+        "[] Arived","[] Descryption","[] Avilable places"
+        ,"Back"};
+
+
+        public static int activPosition = 0;
+
+        public static int OfferID { get; private set; }
+
+        static void EditOffer(Home home)
         {
             Console.WriteLine("Edit offer:");
             Console.WriteLine();
+            Console.WriteLine("If you want change either offer, select suitable offer..");
+            GetData(home);
+            static void GetData(Home home)
+            {
+                //your MySQL connection string
+                string connStr = $"server=localhost;user=root;database=biuropodrozy;port=3306;password=drzwi";
+
+                MySqlConnection conn = new MySqlConnection(connStr);
+
+
+
+                conn.Open();
+
+                //SQL Query to execute
+                //selecting only first 10 rows for demo
+                string sql = "SELECT * FROM Oferty_podrozy ";
+                MySqlCommand cmd = new MySqlCommand(sql, conn);
+                MySqlDataReader rdr = cmd.ExecuteReader();
+
+
+                Console.WriteLine();
+                //read the data
+                while (rdr.Read())
+                {
+
+
+                    Console.WriteLine("ID: " + rdr[0] + " -- " + rdr[1] + " Euro" + " -- " + rdr[2] + " -- \n" + rdr[3] + " Euro" + " -- " + rdr[4] + " -- " + rdr[5]);
+                    Console.WriteLine();
+                }
+
+                rdr.Close();
+
+
+                conn.Close();
+            }
+            Console.Write("Insert ID Ofer wich you want to change:");
+
+            string ID = Console.ReadLine();
+            int OfferID = int.Parse(ID);
+
+            GetData1(OfferID);
+
+
+
+
+
+
+            static void GetData1(int OfferID)
+            {
+                string connStr = $"server=localhost;user=root;database=biuropodrozy;port=3306;password=drzwi";
+
+                MySqlConnection conn = new MySqlConnection(connStr);
+
+
+
+                conn.Open();
+
+                //SQL Query to execute
+                //selecting only first 10 rows for demo
+                string sql = $"SELECT * FROM Oferty_podrozy WHERE Id_oferty_podrozy = {OfferID}";
+                MySqlCommand cmd = new MySqlCommand(sql, conn);
+                MySqlDataReader rdr = cmd.ExecuteReader();
+
+
+                Console.WriteLine();
+                //read the data
+                while (rdr.Read())
+                {
+                    Console.Clear();
+                    rdr.Read();
+                    Console.WriteLine("ID: " + rdr[0] + " -- " + "\nDestynation: " + rdr[1] + "\nPrice: " + rdr[2] + " Euro" + "\nDeparture: " + rdr[3] + "\nArived: " + rdr[4] + "\nDescription: " + rdr[5] + "\nAvilable places: " + rdr[6]);
+                    Console.WriteLine();
+                }
+
+                rdr.Close();
+
+
+                conn.Close();
+            }
+
+            ChangeOfferMenu(home, OfferID);
+
+
+
+            static void ChangeOfferMenu(Home home, int OfferID)
+            {
+
+
+                Console.CursorVisible = false;
+                while (true)
+                {
+
+
+                    show(home, OfferID);
+                    ChooseOpt(home, OfferID);
+                    Decide(home, OfferID);
+                }
+
+            }
+
+            static void show(Home home, int OfferID)
+            {
+
+
+                Console.Clear();
+                Console.BackgroundColor = ConsoleColor.Black;
+                Console.ForegroundColor = ConsoleColor.DarkGreen;
+                Console.ForegroundColor = ConsoleColor.DarkGreen;
+                Console.WriteLine();
+
+                GetData1(OfferID);
+
+                static void GetData1(int OfferID)
+                {
+                    string connStr = $"server=localhost;user=root;database=biuropodrozy;port=3306;password=drzwi";
+
+                    MySqlConnection conn = new MySqlConnection(connStr);
+
+
+
+                    conn.Open();
+
+                    //SQL Query to execute
+                    //selecting only first 10 rows for demo
+                    string sql = $"SELECT * FROM Oferty_podrozy WHERE Id_oferty_podrozy = {OfferID}";
+                    MySqlCommand cmd = new MySqlCommand(sql, conn);
+                    MySqlDataReader rdr = cmd.ExecuteReader();
+
+
+                    Console.WriteLine();
+                    //read the data
+                    while (rdr.Read())
+                    {
+                        Console.Clear();
+                        rdr.Read();
+                        string ofertaInfo = $"ID: {rdr[0]} \nDestynation:  {rdr[1]} \nPrice:  {rdr[2]}  Euro \nDeparture: {rdr[3]} \nArived: {rdr[4]} \nDescription: {rdr[5]} \nAvilable places: {rdr[6]}";
+                        Console.WriteLine(ofertaInfo);
+                        Console.WriteLine();
+                    }
+
+                    rdr.Close();
+
+
+                    conn.Close();
+                }
+
+                Console.WriteLine("What part of this tour are you want to change ? ");
+
+
+                for (int k = 0; k < position.Length; k++)
+
+                    if (k == activPosition)
+                    {
+                        Console.BackgroundColor = ConsoleColor.DarkGreen;
+                        Console.ForegroundColor = ConsoleColor.Black;
+                        Console.WriteLine("{0,-35}", position[k]);
+                        Console.BackgroundColor = ConsoleColor.Black;
+                        Console.ForegroundColor = ConsoleColor.DarkGreen;
+
+                    }
+                    else
+                    {
+                        Console.WriteLine(position[k]);
+                    }
+
+
+            }
+            static void ChooseOpt(Home home, int OfferID)
+            {
+                do
+                {
+                    ConsoleKeyInfo button = Console.ReadKey();
+                    if (button.Key == ConsoleKey.UpArrow)
+                    {
+                        activPosition = (activPosition > 0) ? activPosition - 1 : position.Length - 1;
+                        ChangeOfferMenu(home, OfferID);
+
+                    }
+                    else if (button.Key == ConsoleKey.DownArrow)
+                    {
+                        activPosition = (activPosition + 1) % position.Length;
+                        ChangeOfferMenu(home, OfferID);
+                    }
+                    else if (button.Key == ConsoleKey.Escape)
+                    {
+                        activPosition = position.Length - 1;
+                        break;
+
+                    }
+                    else if (button.Key == ConsoleKey.Enter)
+                        break;
+
+                } while (true);
+
+
+            }
+
+
+            static void Decide(Home home, int OfferID)
+            {
+
+
+                switch (activPosition)
+                {
+                    case 0: Console.Clear(); DestynationEdit(OfferID); break;
+                    case 1: Console.Clear(); PriceEdit(OfferID); break;
+                    case 2: Console.Clear(); DepartureEdit(OfferID); break;
+                    case 3: Console.Clear(); ArivedEdit(OfferID); break;
+                    case 4: Console.Clear(); DescryptionEdit(OfferID); break;
+                    case 5: Console.Clear(); PlaceEdit(OfferID); break;
+                    case 6: Console.Clear(); home.StartMenu(home); break;
+
+                }
+            }
+
+        }
+        static void DestynationEdit(int OfferID)
+        {
+            Console.WriteLine("Destynation Editor:");
+            Console.WriteLine();
+
+            Console.WriteLine();
+            Console.Write("Insert new destynation (City,Country):");
+            string NewDest = Console.ReadLine();
+
+            EditData(NewDest, OfferID);
+
+            static void EditData(string NewDest, int OfferID)
+            {
+                //your MySQL connection string
+                string connStr = $"server=localhost;user=root;database=biuropodrozy;port=3306;password=drzwi";
+
+                MySqlConnection conn = new MySqlConnection(connStr);
+
+
+                try
+                {
+                    conn.Open();
+
+                    //SQL Query to execute
+                    //selecting only first 10 rows for demo
+                    string sql = $"UPDATE Oferty_podrozy SET Cel_podrozy = '{NewDest}' WHERE ID_oferty_podrozy = {OfferID};";
+                    MySqlCommand cmd = new MySqlCommand(sql, conn);
+
+                    int rowsAffected = cmd.ExecuteNonQuery();
+
+
+                    if (rowsAffected > 0)
+                    {
+                        Console.SetCursorPosition(12, 4);
+                        Console.WriteLine("Great,Your Changes were successful");
+                        Console.WriteLine("If you want to see the corrected offer, click enter");
+                    }
+                    else
+                    {
+                        Console.WriteLine("Brak danych.");
+                    }
+
+
+                }
+                catch (Exception exx)
+                {
+                    Console.WriteLine($"Somthing went wrong: {exx}");
+                }
+                finally
+                {
+
+
+                    conn.Close();
+
+                }
+
+            }
+
+
+
+
             Console.ReadKey();
-            Console.WriteLine("If you wont ");
+        }
+
+
+        static void PriceEdit(int OfferID)
+        {
+            Console.WriteLine("Price Editor:");
+            Console.WriteLine();
+
+            Console.WriteLine();
+            Console.Write("Insert new Price ");
+            string NewP = Console.ReadLine();
+            int NewPrice = int.Parse(NewP);
+            EditData(NewPrice, OfferID);
+
+            static void EditData(int NewPrice, int OfferID)
+            {
+                string connStr = $"server=localhost;user=root;database=biuropodrozy;port=3306;password=drzwi";
+
+                MySqlConnection conn = new MySqlConnection(connStr);
+
+
+
+                conn.Open();
+                string sql = $"UPDATE Oferty_podrozy SET Cena = {NewPrice} WHERE ID_oferty_podrozy = {OfferID};";
+                MySqlCommand cmd = new MySqlCommand(sql, conn);
+                MySqlDataReader rdr = cmd.ExecuteReader();
+
+
+
+                conn.Close();
+
+                Console.SetCursorPosition(12, 4);
+                Console.WriteLine("Great! Your Tour Adding was successful! ");
+                Console.WriteLine("If you want to see your tour, go to the \"Searching Offer\" page and check it out.");
+
+                Console.ReadKey();
+            }
+
+        }
+        static void DepartureEdit(int OfferID)
+        {
+            Console.WriteLine("Departure Editor:");
+            Console.WriteLine();
+
+            Console.WriteLine();
+            Console.Write("Insert new deprature date:");
+            string NewDept = Console.ReadLine();
+
+            EditData(NewDept, OfferID);
+
+            static void EditData(string NewDept, int OfferID)
+            {
+                //your MySQL connection string
+                string connStr = $"server=localhost;user=root;database=biuropodrozy;port=3306;password=drzwi";
+
+                MySqlConnection conn = new MySqlConnection(connStr);
+
+
+                try
+                {
+                    conn.Open();
+
+                    //SQL Query to execute
+                    //selecting only first 10 rows for demo
+                    string sql = $"UPDATE Oferty_podrozy SET Data_rozpoczenca = '{NewDept}' WHERE ID_oferty_podrozy = {OfferID};";
+                    MySqlCommand cmd = new MySqlCommand(sql, conn);
+
+                    int rowsAffected = cmd.ExecuteNonQuery();
+
+
+                    if (rowsAffected > 0)
+                    {
+                        Console.SetCursorPosition(12, 4);
+                        Console.WriteLine("Great,Your Changes were successful");
+                        Console.WriteLine("If you want to see the corrected offer, click enter");
+                    }
+                    else
+                    {
+                        Console.WriteLine("Brak danych.");
+                    }
+
+
+                }
+                catch (Exception exx)
+                {
+                    Console.WriteLine($"Somthing went wrong: {exx}");
+                }
+                finally
+                {
+
+
+                    conn.Close();
+
+                }
+
+            }
 
 
         }
+        static void ArivedEdit(int OfferID)
+        {
+            Console.WriteLine("Return Editor:");
+            Console.WriteLine();
+
+            Console.WriteLine();
+            Console.Write("Insert new return Date (Y-M-D):");
+            string NewRet = Console.ReadLine();
+
+            EditData(NewRet, OfferID);
+
+            static void EditData(string NewRet, int OfferID)
+            {
+                //your MySQL connection string
+                string connStr = $"server=localhost;user=root;database=biuropodrozy;port=3306;password=drzwi";
+
+                MySqlConnection conn = new MySqlConnection(connStr);
+
+
+                try
+                {
+                    conn.Open();
+
+                    //SQL Query to execute
+                    //selecting only first 10 rows for demo
+                    string sql = $"UPDATE Oferty_podrozy SET Data_zakonczenia = '{NewRet}' WHERE ID_oferty_podrozy = {OfferID};";
+                    MySqlCommand cmd = new MySqlCommand(sql, conn);
+
+                    int rowsAffected = cmd.ExecuteNonQuery();
+
+
+                    if (rowsAffected > 0)
+                    {
+                        Console.SetCursorPosition(12, 4);
+                        Console.WriteLine("Great,Your Changes were successful");
+                        Console.WriteLine("If you want to see the corrected offer, click enter");
+                    }
+                    else
+                    {
+                        Console.WriteLine("Brak danych.");
+                    }
+
+
+                }
+                catch (Exception exx)
+                {
+                    Console.WriteLine($"Somthing went wrong: {exx}");
+                }
+                finally
+                {
+
+
+                    conn.Close();
+
+                }
+
+            }
+
+
+        }
+        static void DescryptionEdit(int OfferID)
+        {
+            Console.WriteLine("Descryption Editor:");
+            Console.WriteLine();
+
+            Console.WriteLine();
+            Console.Write("Insert new descryption:");
+            string NewDesc = Console.ReadLine();
+
+            EditData(NewDesc, OfferID);
+
+            static void EditData(string NewDesc, int OfferID)
+            {
+                //your MySQL connection string
+                string connStr = $"server=localhost;user=root;database=biuropodrozy;port=3306;password=drzwi";
+
+                MySqlConnection conn = new MySqlConnection(connStr);
+
+
+                try
+                {
+                    conn.Open();
+
+                    //SQL Query to execute
+                    //selecting only first 10 rows for demo
+                    string sql = $"UPDATE Oferty_podrozy SET Opis = '{NewDesc}' WHERE ID_oferty_podrozy = {OfferID};";
+                    MySqlCommand cmd = new MySqlCommand(sql, conn);
+
+                    int rowsAffected = cmd.ExecuteNonQuery();
+
+
+                    if (rowsAffected > 0)
+                    {
+                        Console.SetCursorPosition(12, 4);
+                        Console.WriteLine("Great,Your Changes were successful");
+                        Console.WriteLine("If you want to see the corrected offer, click enter");
+                    }
+                    else
+                    {
+                        Console.WriteLine("Brak danych.");
+                    }
+
+
+                }
+                catch (Exception exx)
+                {
+                    Console.WriteLine($"Somthing went wrong: {exx}");
+                }
+                finally
+                {
+
+
+                    conn.Close();
+
+                }
+
+            }
+
+
+        }
+        static void PlaceEdit(int OfferID)
+        {
+            Console.WriteLine("Accessible place Editor:");
+            Console.WriteLine();
+
+            Console.WriteLine();
+            Console.Write("Insert new namber of places:");
+            string NewP = Console.ReadLine();
+            int NewPlace = int.Parse(NewP);
+            EditData(NewPlace, OfferID);
+
+
+            static void EditData(int NewPlace, int OfferID)
+            {
+                //your MySQL connection string
+                string connStr = $"server=localhost;user=root;database=biuropodrozy;port=3306;password=drzwi";
+
+                MySqlConnection conn = new MySqlConnection(connStr);
+
+
+                try
+                {
+                    conn.Open();
+
+                    //SQL Query to execute
+                    //selecting only first 10 rows for demo
+                    string sql = $"UPDATE Oferty_podrozy SET Dostepne_miejsca = {NewPlace} WHERE ID_oferty_podrozy = {OfferID};";
+                    MySqlCommand cmd = new MySqlCommand(sql, conn);
+
+                    int rowsAffected = cmd.ExecuteNonQuery();
+
+
+                    if (rowsAffected > 0)
+                    {
+                        Console.SetCursorPosition(12, 4);
+                        Console.WriteLine("Great,Your Changes were successful");
+                        Console.WriteLine("If you want to see the corrected offer, click enter");
+                    }
+                    else
+                    {
+                        Console.WriteLine("Brak danych.");
+                    }
+
+
+                }
+                catch (Exception exx)
+                {
+                    Console.WriteLine($"Somthing went wrong: {exx}");
+                }
+                finally
+                {
+
+
+                    conn.Close();
+
+                }
+
+
+                Console.ReadKey();
+            }
+        }
+
+        static void Delate(Home home)
+        {
+            Console.WriteLine("Delate offer:");
+            Console.WriteLine();
+            Console.WriteLine("If you want delate either offer, select suitable offer.");
+            GetData(home);
+            static void GetData(Home home)
+            {
+                //your MySQL connection string
+                string connStr = $"server=localhost;user=root;database=biuropodrozy;port=3306;password=drzwi";
+
+                MySqlConnection conn = new MySqlConnection(connStr);
+
+
+
+                conn.Open();
+
+                //SQL Query to execute
+                //selecting only first 10 rows for demo
+                string sql = "SELECT * FROM Oferty_podrozy ";
+                MySqlCommand cmd = new MySqlCommand(sql, conn);
+                MySqlDataReader rdr = cmd.ExecuteReader();
+
+
+                Console.WriteLine();
+                //read the data
+                while (rdr.Read())
+                {
+
+
+                    Console.WriteLine("ID: " + rdr[0] + " -- " + rdr[1] + " Euro" + " -- " + rdr[2] + " -- \n" + rdr[3] + " Euro" + " -- " + rdr[4] + " -- " + rdr[5]);
+                    Console.WriteLine();
+                }
+
+                rdr.Close();
+
+
+                conn.Close();
+            }
+            Console.Write("Insert the ID of the offer you want to delete: ");
+            if (int.TryParse(Console.ReadLine(), out int offerID))
+            {
+                DelateData(offerID);
+            }
+            else
+            {
+                Console.WriteLine("Invalid offer ID.");
+            }
+            Console.ReadKey();
+
+            DelateData(OfferID);
+
+            static void DelateData(int offerID)
+            {
+                Console.WriteLine();
+                string connectionString = $"server=localhost;user=root;database=biuropodrozy;port=3306;password=drzwi";
+
+                // SQL query for deleting data
+                string query = $"DELETE FROM Oferty_podrozy WHERE Id_oferty_podrozy ={offerID};";
+
+                // Create SqlConnection
+                using (MySqlConnection connection = new MySqlConnection(connectionString))
+                {
+                    // Create SqlCommand
+                    using (MySqlCommand command = new MySqlCommand(query, connection))
+                    {
+                        try
+                        {
+                            // Open connection
+                            connection.Open();
+
+                            // ExecuteNonQuery for executing DELETE query
+                            int rowsAffected = command.ExecuteNonQuery();
+
+                            // Check if any rows are affected
+                            if (rowsAffected > 0)
+                            {
+                                Console.WriteLine("Data deleted successfully.");
+                            }
+                            else
+                            {
+                                Console.WriteLine("No data deleted.");
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"Error: {ex.Message}");
+                        }
+                    }
+                }
+                Console.ReadKey();
+
+            }
+
+        }
+
+
     }
+
 }
+
+
+
+
+
+
+
+
+
 
 
 
