@@ -122,24 +122,24 @@ namespace TravelAgency
         {
             string connectionString = "Data Source=myServerAddress;Initial Catalog=myDataBase;User Id=myUsername;Password=myPassword;";
 
-            // SQL query for deleting data
+            
             string query = "DELETE FROM YourTableName WHERE YourCondition;";
 
-            // Create SqlConnection
+           
             using (MySqlConnection connection = new MySqlConnection(connectionString))
             {
-                // Create SqlCommand
+               
                 using (MySqlCommand command = new MySqlCommand(query, connection))
                 {
                     try
                     {
-                        // Open connection
+                        
                         connection.Open();
 
-                        // ExecuteNonQuery for executing DELETE query
+                        
                         int rowsAffected = command.ExecuteNonQuery();
 
-                        // Check if any rows are affected
+                       
                         if (rowsAffected > 0)
                         {
                             Console.WriteLine("Data deleted successfully.");

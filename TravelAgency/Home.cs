@@ -116,7 +116,7 @@ namespace TravelAgency
                 case 1: Console.Clear(); AddNewData(home); break;
                 case 2: Console.Clear(); EditOffer(home); break;
                 case 3: Console.Clear(); Delate(home); break;
-                case 4: Console.Clear(); OptionUnderConstruction(); break;
+                case 4: Console.Clear(); TicketReservation(home); break;
                 case 5: Environment.Exit(0); break;
 
             }
@@ -170,33 +170,40 @@ namespace TravelAgency
             Console.WriteLine();
 
 
-            Console.Write("Where ? (City/Country) :");
+            Console.Write("Where ? (City/Country) : ");
             string destynation = Console.ReadLine();
 
-            if (destynation.Length <= 3)
+            if (destynation.Length < 3)
             {
-                Console.WriteLine("Something went wrong, name of your City and country is too short. Try again :) ");
+                Console.WriteLine("Something went wrong, the name of your City or country is too short. Try again :) ");
                 Console.Clear();
-                AddNewData(home);
-                return; // Add return to eneble software use 
+                return;
             }
-
 
             Console.WriteLine();
             Console.Write("When? (departure- Y-M-D): ");
-            string dept = Console.ReadLine();
+            string departur = Console.ReadLine();
 
-            DateTime date = DateTime.Parse(dept);
+            DateTime date;
 
-            if (date <= DateTime.Now)
+            if (!DateTime.TryParse(departur, out date))
             {
                 Console.WriteLine("Invalid date format. Please enter the date in the correct format (Y-M-D).");
                 Console.WriteLine();
                 Console.Clear();
                 AddNewData(home);
                 return;
-
             }
+
+            if (date <= DateTime.Now)
+            {
+                Console.WriteLine("Invalid date. Please enter a date in the future.");
+                Console.WriteLine();
+                Console.Clear();
+                AddNewData(home);
+                return;
+            }
+
 
 
             else if (date > DateTime.Now)
@@ -210,6 +217,8 @@ namespace TravelAgency
                 Console.Clear();
                 return;
             }
+
+
             string departure = date.ToString();
 
 
@@ -224,7 +233,7 @@ namespace TravelAgency
             Console.Write("Write few words about this tour: ");
             string tourDescription = Console.ReadLine();
             Console.WriteLine();
-            int id = 8;
+            
             Console.Write("How many places are available? :");
             string places = Console.ReadLine();
             InsertData(password, destynation, departure, arrived, price, tourDescription, places);
@@ -237,7 +246,7 @@ namespace TravelAgency
                     if (key.Key == ConsoleKey.Escape)
                     {
                         Console.WriteLine("Adding new offer cancelled.");
-                        break; // Break out of the loop to exit the function
+                        break; 
                     }
                 }
             }
@@ -253,26 +262,7 @@ namespace TravelAgency
 
         static void InsertData(string password, string destynation, string departure, string arrived, string price, string tourDescription, string places)
         {
-            string connStr = $"server=localhost;user=root;database=biuropodrozy;port=3306;password=drzwi";
-
-            string sql1 = "SELECT Id_oferty_podrozy FROM Oferty_podrozy ORDER BY Id_oferty_podrozy DESC LIMIT 1;";
-            int sql3 = 0;
-
-            using (MySqlConnection conn = new MySqlConnection(connStr))
-            {
-                conn.Open();
-                MySqlCommand cmd = new MySqlCommand(sql1, conn);
-                using (MySqlDataReader rdr = cmd.ExecuteReader())
-                {
-                    if (rdr.Read())
-                    {
-                        // Pobranie wartości zapytania SQL i konwersja na int
-                        sql3 = rdr.GetInt32(0);
-                    }
-                }
-            }
-            sql3++;
-            string sql2 = sql3.ToString();
+            
 
 
             string connStr1 = $"server=localhost;user=root;database=biuropodrozy;port=3306;password={password}";
@@ -285,7 +275,7 @@ namespace TravelAgency
 
 
 
-                string sql = $"INSERT INTO Oferty_podrozy (Id_oferty_podrozy,Cel_podrozy, Data_rozpoczecia, Data_zakonczenia, Cena, Opis, Dostepne_miejsca) VALUES ({sql2},'{destynation}','{departure}','{arrived}',{price},'{tourDescription}',{places})";
+                string sql = $"INSERT INTO Oferty_podrozy (Destination, Price,Departure, Arrived,  Description, Dostepne_miejsca) VALUES ('{destynation}',{price},'{departure}','{arrived}','{tourDescription}',{places})";
                 MySqlCommand cmd = new MySqlCommand(sql, conn1);
                 MySqlDataReader rdr = cmd.ExecuteReader();
                 rdr.Read();
@@ -423,7 +413,7 @@ namespace TravelAgency
             ConsoleKeyInfo key;
             Console.WriteLine("Searching offer");
             Console.WriteLine();
-            Console.Write("Enter departure data:");
+            Console.Write("Enter departure data (YYYY - MM- DD):");
             string from = Console.ReadLine();
 
             Console.WriteLine();
@@ -442,9 +432,8 @@ namespace TravelAgency
                 {
                     conn.Open();
 
-                    //SQL Query to execute
-                    //selecting only first 10 rows for demo
-                    string sql = $"SELECT Cel_podrozy,Data_rozpoczecia,Data_zakonczenia,Cena,Opis,Dostepne_miejsca FROM Oferty_podrozy WHERE Data_rozpoczecia >= '{from}';";
+                   
+                    string sql = $"SELECT * FROM Oferty_podrozy WHERE Departure >= '{from}';";
                     MySqlCommand cmd = new MySqlCommand(sql, conn);
                     MySqlDataReader rdr = cmd.ExecuteReader();
 
@@ -493,7 +482,7 @@ namespace TravelAgency
             Console.WriteLine("Searching offer");
 
             Console.WriteLine();
-            Console.Write("Enter place where you wont to go:");
+            Console.Write("Enter place where you wont to go(City):");
 
             string destynation = Console.ReadLine();
             Console.WriteLine();
@@ -513,9 +502,8 @@ namespace TravelAgency
                 {
                     conn.Open();
 
-                    //SQL Query to execute
-                    //selecting only first 10 rows for demo
-                    string sql = $"SELECT Cel_podrozy,Data_rozpoczecia,Data_zakonczenia,Cena,Opis,Dostepne_miejsca FROM Oferty_podrozy WHERE Cel_podrozy = '{destynation}';";
+                   
+                    string sql = $"SELECT *FROM Oferty_podrozy WHERE Destination = '{destynation}';";
                     MySqlCommand cmd = new MySqlCommand(sql, conn);
                     MySqlDataReader rdr = cmd.ExecuteReader();
 
@@ -580,9 +568,8 @@ namespace TravelAgency
                 {
                     conn.Open();
 
-                    //SQL Query to execute
-                    //selecting only first 10 rows for demo
-                    string sql = $"SELECT Cel_podrozy,Data_rozpoczecia,Data_zakonczenia,Cena,Opis,Dostepne_miejsca FROM Oferty_podrozy WHERE Cena <= {amount};";
+                    
+                    string sql = $"SELECT *FROM Oferty_podrozy WHERE Price >= {amount};";
                     MySqlCommand cmd = new MySqlCommand(sql, conn);
                     MySqlDataReader rdr = cmd.ExecuteReader();
 
@@ -660,7 +647,7 @@ namespace TravelAgency
                 {
 
 
-                    Console.WriteLine("ID: " + rdr[0] + " -- " + rdr[1] + " Euro" + " -- " + rdr[2] + " -- \n" + rdr[3] + " Euro" + " -- " + rdr[4] + " -- " + rdr[5]);
+                    Console.WriteLine("ID: " + rdr[0] + " -- " + rdr[1] + " Euro" + " -- " + rdr[2] + " -- \n" + rdr[3] + " Euro" + " -- " + rdr[4] + " -- " + rdr[5] + " -- " + "Avilable places: " + rdr[6]);
                     Console.WriteLine();
                 }
 
@@ -671,10 +658,15 @@ namespace TravelAgency
             }
             Console.Write("Insert ID Ofer wich you want to change:");
 
-            string ID = Console.ReadLine();
-            int OfferID = int.Parse(ID);
 
-            GetData1(OfferID);
+            if (int.TryParse(Console.ReadLine(), out int offerID))
+            {
+                GetData1(offerID);
+            }
+            else
+            {
+                Console.WriteLine("Invalid offer ID.");
+            }
 
 
 
@@ -691,20 +683,19 @@ namespace TravelAgency
 
                 conn.Open();
 
-                //SQL Query to execute
-                //selecting only first 10 rows for demo
+               
                 string sql = $"SELECT * FROM Oferty_podrozy WHERE Id_oferty_podrozy = {OfferID}";
                 MySqlCommand cmd = new MySqlCommand(sql, conn);
                 MySqlDataReader rdr = cmd.ExecuteReader();
 
 
                 Console.WriteLine();
-                //read the data
+               
                 while (rdr.Read())
                 {
                     Console.Clear();
                     rdr.Read();
-                    Console.WriteLine("ID: " + rdr[0] + " -- " + "\nDestynation: " + rdr[1] + "\nPrice: " + rdr[2] + " Euro" + "\nDeparture: " + rdr[3] + "\nArived: " + rdr[4] + "\nDescription: " + rdr[5] + "\nAvilable places: " + rdr[6]);
+                    Console.WriteLine("ID: " + rdr[0] + " -- " + "\nDestynation: " + rdr[1] + "\nPrice: " + rdr[2] + " Euro" + "\nDeparture: " + rdr[3] + "\nArrived: " + rdr[4] + "\nDescription: " + rdr[5] + "\nAvilable places: " + rdr[6]);
                     Console.WriteLine();
                 }
 
@@ -769,7 +760,7 @@ namespace TravelAgency
                     {
                         Console.Clear();
                         rdr.Read();
-                        string ofertaInfo = $"ID: {rdr[0]} \nDestynation:  {rdr[1]} \nPrice:  {rdr[2]}  Euro \nDeparture: {rdr[3]} \nArived: {rdr[4]} \nDescription: {rdr[5]} \nAvilable places: {rdr[6]}";
+                        string ofertaInfo = $"ID: {rdr[0]} \nDestynation:  {rdr[1]} \nPrice:  {rdr[2]}  Euro \nDeparture: {rdr[3]} \nArrived: {rdr[4]} \nDescription: {rdr[5]} \nAvilable places: {rdr[6]}";
                         Console.WriteLine(ofertaInfo);
                         Console.WriteLine();
                     }
@@ -875,7 +866,7 @@ namespace TravelAgency
 
                     //SQL Query to execute
                     //selecting only first 10 rows for demo
-                    string sql = $"UPDATE Oferty_podrozy SET Cel_podrozy = '{NewDest}' WHERE ID_oferty_podrozy = {OfferID};";
+                    string sql = $"UPDATE Oferty_podrozy SET Destination = '{NewDest}' WHERE ID_oferty_podrozy = {OfferID};";
                     MySqlCommand cmd = new MySqlCommand(sql, conn);
 
                     int rowsAffected = cmd.ExecuteNonQuery();
@@ -935,7 +926,7 @@ namespace TravelAgency
 
 
                 conn.Open();
-                string sql = $"UPDATE Oferty_podrozy SET Cena = {NewPrice} WHERE ID_oferty_podrozy = {OfferID};";
+                string sql = $"UPDATE Oferty_podrozy SET Price = {NewPrice} WHERE ID_oferty_podrozy = {OfferID};";
                 MySqlCommand cmd = new MySqlCommand(sql, conn);
                 MySqlDataReader rdr = cmd.ExecuteReader();
 
@@ -976,7 +967,7 @@ namespace TravelAgency
 
                     //SQL Query to execute
                     //selecting only first 10 rows for demo
-                    string sql = $"UPDATE Oferty_podrozy SET Data_rozpoczenca = '{NewDept}' WHERE ID_oferty_podrozy = {OfferID};";
+                    string sql = $"UPDATE Oferty_podrozy SET Departure = '{NewDept}' WHERE ID_oferty_podrozy = {OfferID};";
                     MySqlCommand cmd = new MySqlCommand(sql, conn);
 
                     int rowsAffected = cmd.ExecuteNonQuery();
@@ -1036,7 +1027,7 @@ namespace TravelAgency
 
                     //SQL Query to execute
                     //selecting only first 10 rows for demo
-                    string sql = $"UPDATE Oferty_podrozy SET Data_zakonczenia = '{NewRet}' WHERE ID_oferty_podrozy = {OfferID};";
+                    string sql = $"UPDATE Oferty_podrozy SET Arrived = '{NewRet}' WHERE ID_oferty_podrozy = {OfferID};";
                     MySqlCommand cmd = new MySqlCommand(sql, conn);
 
                     int rowsAffected = cmd.ExecuteNonQuery();
@@ -1096,7 +1087,7 @@ namespace TravelAgency
 
                     //SQL Query to execute
                     //selecting only first 10 rows for demo
-                    string sql = $"UPDATE Oferty_podrozy SET Opis = '{NewDesc}' WHERE ID_oferty_podrozy = {OfferID};";
+                    string sql = $"UPDATE Oferty_podrozy SET Description = '{NewDesc}' WHERE ID_oferty_podrozy = {OfferID};";
                     MySqlCommand cmd = new MySqlCommand(sql, conn);
 
                     int rowsAffected = cmd.ExecuteNonQuery();
@@ -1145,7 +1136,7 @@ namespace TravelAgency
 
             static void EditData(int NewPlace, int OfferID)
             {
-                //your MySQL connection string
+               
                 string connStr = $"server=localhost;user=root;database=biuropodrozy;port=3306;password=drzwi";
 
                 MySqlConnection conn = new MySqlConnection(connStr);
@@ -1155,8 +1146,7 @@ namespace TravelAgency
                 {
                     conn.Open();
 
-                    //SQL Query to execute
-                    //selecting only first 10 rows for demo
+                  
                     string sql = $"UPDATE Oferty_podrozy SET Dostepne_miejsca = {NewPlace} WHERE ID_oferty_podrozy = {OfferID};";
                     MySqlCommand cmd = new MySqlCommand(sql, conn);
 
@@ -1250,24 +1240,24 @@ namespace TravelAgency
                 Console.WriteLine();
                 string connectionString = $"server=localhost;user=root;database=biuropodrozy;port=3306;password=drzwi";
 
-                // SQL query for deleting data
+
                 string query = $"DELETE FROM Oferty_podrozy WHERE Id_oferty_podrozy ={offerID};";
 
-                // Create SqlConnection
+
                 using (MySqlConnection connection = new MySqlConnection(connectionString))
                 {
-                    // Create SqlCommand
+
                     using (MySqlCommand command = new MySqlCommand(query, connection))
                     {
                         try
                         {
-                            // Open connection
+
                             connection.Open();
 
-                            // ExecuteNonQuery for executing DELETE query
+
                             int rowsAffected = command.ExecuteNonQuery();
 
-                            // Check if any rows are affected
+
                             if (rowsAffected > 0)
                             {
                                 Console.WriteLine("Data deleted successfully.");
@@ -1290,9 +1280,417 @@ namespace TravelAgency
         }
 
 
-    }
 
+
+
+
+
+
+
+        static int nextId = 0;
+        static string Depart;
+        static string Email;
+
+        static void TicketReservation(Home home)
+        {
+            Console.WriteLine("Ticket Reservation:");
+            Console.WriteLine();
+            Console.WriteLine(" For which tour are you wont to make reservation? ");
+            GetData(home);
+            static void GetData(Home home)
+            {
+
+                string connStr = $"server=localhost;user=root;database=biuropodrozy;port=3306;password=drzwi";
+
+                MySqlConnection conn = new MySqlConnection(connStr);
+
+
+
+                conn.Open();
+
+
+                string sql = "SELECT * FROM Oferty_podrozy ";
+                MySqlCommand cmd = new MySqlCommand(sql, conn);
+                MySqlDataReader rdr = cmd.ExecuteReader();
+
+
+                Console.WriteLine();
+
+                while (rdr.Read())
+                {
+
+
+                    Console.WriteLine("ID: " + rdr[0] + " -- " + rdr[1] + " Euro" + " -- " + rdr[2] + " -- \n" + rdr[3] + " Euro" + " -- " + rdr[4] + " -- " + rdr[5] + " -- " + "Avilable places: " + rdr[6]);
+                    Console.WriteLine();
+                }
+
+                rdr.Close();
+
+
+                conn.Close();
+            }
+
+            Console.Write("Insert ID Offer which you want to make a reservation:");
+            string offerIDString = Console.ReadLine();
+
+
+            if (int.TryParse(offerIDString, out int offerID))
+            {
+                GetData2(offerID, Depart, Email);
+            }
+            else
+            {
+                Console.WriteLine("Invalid offer ID entered.");
+            }
+
+            static void GetData2(int offerID, string Depart, string email)
+            {
+                string connStr = $"server=localhost;user=root;database=biuropodrozy;port=3306;password=drzwi";
+
+                try
+                {
+                    using (MySqlConnection conn = new MySqlConnection(connStr))
+                    {
+                        conn.Open();
+
+                        string sql = "SELECT * FROM Oferty_podrozy WHERE Id_oferty_podrozy = @offerID";
+                        MySqlCommand cmd = new MySqlCommand(sql, conn);
+                        cmd.Parameters.AddWithValue("@OfferID", offerID);
+
+                        using (MySqlDataReader rdr = cmd.ExecuteReader())
+                        {
+                            while (rdr.Read())
+                            {
+                                Console.Clear();
+                                string ofertaInfo = $"ID: {rdr[0]} \nDestination: {rdr[1]} \nPrice: {rdr[2]} Euro \nDeparture: {rdr.GetDateTime(3).ToString("yyyy-MM-dd")} \nArrived: {rdr[4]} \nDescription: {rdr[5]} \nAvailable places: {rdr[6]}";
+                                Console.WriteLine(ofertaInfo);
+
+                                Depart = rdr.GetDateTime(3).ToString("yyyy-MM-dd");
+                                AddReservation(Depart, offerID, email);
+
+                                Console.WriteLine();
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("An error occurred: " + ex.Message);
+                }
+
+
+                Console.WriteLine("Are you wont make reservation for exist client or for new klient ?");
+                Console.WriteLine();
+                Console.Write("Insert NEW for new or OLD for exist klient: ");
+                string decide = Console.ReadLine();
+                string NewOrOld = decide.ToUpper();
+
+                if (NewOrOld == "NEW")
+                {
+                    AddClientToDatabase(Email, offerID);
+                    Console.ReadKey();
+                }
+                else
+                {
+                    Console.Write("Email: ");
+                    string Email = Console.ReadLine();
+                    if (!IsValidEmail(Email))
+                    {
+                        Console.WriteLine("Invalid email format.");
+
+                    }
+                    Console.WriteLine();
+
+                    if (ClientExists(Email))
+                    {
+                        Console.WriteLine("OK! We create a reservation for you :D");
+                        Console.WriteLine();
+                        AddReservation(Depart, offerID, Email);
+                        Console.ReadKey();
+                    }
+
+                }
+            }
+
+
+
+
+
+
+            Console.ReadKey();
+        }
+
+
+        static bool IsValidEmail(string Email)
+        {
+            return !string.IsNullOrWhiteSpace(Email) && Email.Contains("@") && (Email.EndsWith(".pl") || Email.EndsWith(".com")); // Dodatkowy warunek sprawdzający końcówkę adresu email
+        }
+
+        static bool IsValidPhoneNumber(string phoneNumber)
+        {
+            return !string.IsNullOrWhiteSpace(phoneNumber) && phoneNumber.Length == 9 && phoneNumber.All(char.IsDigit); // Warunek sprawdzający długość numeru telefonu oraz czy składa się tylko z cyfr
+        }
+
+        static bool IsValidDateOfBirth(string dateOfBirth)
+        {
+            DateTime dob;
+            if (DateTime.TryParse(dateOfBirth, out dob))
+            {
+                return dob < DateTime.Now;
+            }
+            return false;
+        }
+
+
+        static bool IsAdult(string dateOfBirth)
+        {
+            DateTime dob;
+            if (DateTime.TryParse(dateOfBirth, out dob))
+            {
+                return DateTime.Now.Subtract(dob).TotalDays / 365 >= 18;
+            }
+            return false;
+
+        }
+
+
+
+        static bool ClientExists(string Email)
+        {
+            string connStr = "server=localhost;user=root;database=biuropodrozy;port=3306;password=drzwi";
+            string query = "SELECT COUNT(*) FROM Klient WHERE Email = @Email";
+
+            using (MySqlConnection conn = new MySqlConnection(connStr))
+            {
+                conn.Open();
+
+                using (MySqlCommand cmd = new MySqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@Email", Email);
+                    int count = Convert.ToInt32(cmd.ExecuteScalar());
+                    return count > 0;
+                }
+            }
+        }
+
+
+
+
+        public static void AddClientToDatabase(string Email, int offerID)
+        {
+            Console.WriteLine("Insert data of person which are you want make reservation: ");
+            Console.WriteLine();
+
+            Console.Write("Email: ");
+            Email = Console.ReadLine();
+            if (!IsValidEmail(Email))
+            {
+                Console.WriteLine("Invalid email format.");
+
+            }
+            Console.WriteLine();
+
+            Console.Write("Name: ");
+            string Name = Console.ReadLine();
+            if (string.IsNullOrWhiteSpace(Name))
+            {
+                Console.WriteLine("Name cannot be empty.");
+
+            }
+            Console.WriteLine();
+
+            Console.Write("Surname: ");
+            string Surname = Console.ReadLine();
+            if (string.IsNullOrWhiteSpace(Surname))
+            {
+                Console.WriteLine("Surname cannot be empty.");
+
+            }
+            Console.WriteLine();
+
+            Console.Write("Address: ");
+            string Address = Console.ReadLine();
+            if (string.IsNullOrWhiteSpace(Address))
+            {
+                Console.WriteLine("Address cannot be empty.");
+
+            }
+            Console.WriteLine();
+
+            Console.Write("Phone number: ");
+            string PhoneNumber = Console.ReadLine();
+            if (!IsValidPhoneNumber(PhoneNumber))
+            {
+                Console.WriteLine("Invalid phone number format.");
+
+            }
+            Console.WriteLine();
+
+            Console.Write("Date of birth (YYYY-MM-DD): ");
+            string DateOfBirth = Console.ReadLine();
+            Console.WriteLine();
+
+
+            if (!IsValidDateOfBirth(DateOfBirth))
+            {
+                Console.WriteLine("Invalid date of birth format.");
+
+                if (!IsAdult(DateOfBirth))
+                {
+                    Console.WriteLine("Person must be at least 18 years old.");
+
+                }
+            }
+
+            Console.WriteLine("All information entered correctly.");
+            Console.WriteLine();
+
+
+            Console.ReadKey();
+
+            string connStr = "server=localhost;user=root;database=biuropodrozy;port=3306;password=drzwi";
+            string query = "INSERT INTO Klient (Imie, Nazwisko, Email, Adres, Nr_tel, Data_urodzenia) VALUES (@Name, @Surname, @Email, @Address, @PhoneNumber, @DateOfBirth)";
+
+            using (MySqlConnection conn = new MySqlConnection(connStr))
+            {
+                conn.Open();
+
+
+
+
+                using (MySqlCommand cmd = new MySqlCommand(query, conn))
+                {
+
+                    cmd.Parameters.AddWithValue("@Name", Name);
+                    cmd.Parameters.AddWithValue("@Surname", Surname);
+                    cmd.Parameters.AddWithValue("@Email", Email);
+                    cmd.Parameters.AddWithValue("@Address", Address);
+                    cmd.Parameters.AddWithValue("@PhoneNumber", PhoneNumber);
+                    cmd.Parameters.AddWithValue("@DateOfBirth", DateOfBirth);
+
+
+                    int rowsAffected = cmd.ExecuteNonQuery();
+                    if (rowsAffected > 0)
+                    {
+                        Console.WriteLine("Client added successfully.");
+                        Console.WriteLine();
+                    }
+                    else
+                    {
+                        Console.WriteLine("Failed to add client to the database.");
+                        Console.WriteLine();
+                    }
+                }
+            }
+            AddReservation(Depart, offerID, Email);
+
+
+
+        }
+
+
+        public static void AddReservation(string Depart, int offerID, string Email)
+        {
+            string connStr1 = "server=localhost;user=root;database=biuropodrozy;port=3306;password=drzwi";
+            string query1 = "SELECT Id_klienta FROM Klient WHERE Email = @Email";
+
+            try
+            {
+                using (MySqlConnection conn1 = new MySqlConnection(connStr1))
+                {
+                    conn1.Open();
+                    using (MySqlCommand cmd1 = new MySqlCommand(query1, conn1))
+                    {
+                        cmd1.Parameters.AddWithValue("@Email", Email);
+
+                        object result = cmd1.ExecuteScalar();
+                        if (result != null)
+                        {
+                            int clientId = Convert.ToInt32(result);
+
+                            string connStr = "server=localhost;user=root;database=biuropodrozy;port=3306;password=drzwi";
+                            string query = "INSERT INTO Rezerwacja (Data_Rezerwacji, Data_Wyjazdu, Status_Wycieczki, Id_klienta, Id_oferty_podrozy, Id_platnosci, Id_przewodnika) VALUES (@Data_Rezerwacji, @Data_Wyjazdu, @Status_Wycieczki, @Id_klienta, @Id_oferty_podrozy, @Id_platnosci, @Id_przewodnika)";
+
+                            using (MySqlConnection conn = new MySqlConnection(connStr))
+                            {
+                                conn.Open();
+                                DateTime today = DateTime.Today;
+                                string formattedDate = today.ToString("yyyy-MM-dd");
+
+                                using (MySqlCommand cmd = new MySqlCommand(query, conn))
+                                {
+                                    cmd.Parameters.AddWithValue("@Data_Rezerwacji", formattedDate);
+                                    cmd.Parameters.AddWithValue("@Data_Wyjazdu", Depart);
+                                    cmd.Parameters.AddWithValue("@Status_Wycieczki", "Oczekujący");
+                                    cmd.Parameters.AddWithValue("@Id_klienta", clientId);
+                                    cmd.Parameters.AddWithValue("@Id_oferty_podrozy", offerID);
+                                    cmd.Parameters.AddWithValue("@Id_platnosci", DBNull.Value);
+                                    cmd.Parameters.AddWithValue("@Id_przewodnika", DBNull.Value);
+                                    int rowsAffected = cmd.ExecuteNonQuery();
+
+                                    if (rowsAffected > 0)
+                                    {
+                                        Console.WriteLine("Reservation added successfully.");
+                                        Console.WriteLine();
+
+                                        UpdateAvailablePlaces(conn, offerID);
+
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine("Failed to add reservation. No rows affected.");
+
+                                    }
+                                }
+                            }
+                        }
+                        else
+                        {
+
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("An error occurred while adding reservation: " + ex.Message);
+
+            }
+        }
+
+        static void UpdateAvailablePlaces(MySqlConnection conn, int offerID)
+        {
+            try
+            {
+                string updateQuery = "UPDATE Oferty_podrozy SET Dostepne_miejsca = Dostepne_miejsca - 1 WHERE Id_oferty_podrozy = @OfferID";
+                using (MySqlCommand updateCmd = new MySqlCommand(updateQuery, conn))
+                {
+                    updateCmd.Parameters.AddWithValue("@OfferID", offerID);
+                    int rowsAffected = updateCmd.ExecuteNonQuery();
+                    if (rowsAffected > 0)
+                    {
+                        Console.WriteLine("Updated available places for offer ID: " + offerID);
+                    }
+                    else
+                    {
+                        Console.WriteLine("No rows were affected while updating available places for offer ID: " + offerID);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("An error occurred while updating available places: " + ex.Message);
+            }
+        }
+
+
+
+    }
 }
+
+
+
+
 
 
 
